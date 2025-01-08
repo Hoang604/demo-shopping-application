@@ -30,4 +30,12 @@ public class Cart {
         this.user = user;
         this.createdDate = new Timestamp(System.currentTimeMillis());
     }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 }

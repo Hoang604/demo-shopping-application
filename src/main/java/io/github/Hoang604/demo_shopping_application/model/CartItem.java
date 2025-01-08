@@ -37,5 +37,21 @@ public class CartItem {
         this.product = product;
         this.quantity = quantity;
     }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setCart(Cart cart) {
+        this.cart = cart;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
     
 }
