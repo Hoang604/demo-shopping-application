@@ -6,6 +6,7 @@ import io.github.Hoang604.demo_shopping_application.model.Product;
 import io.github.Hoang604.demo_shopping_application.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import io.github.Hoang604.demo_shopping_application.service.CategoryService;
 
 import java.util.List;
 
@@ -13,9 +14,11 @@ import java.util.List;
 @RequestMapping("/api/products")
 public class ProductController {
 
-    private ProductService productService;
+    private final ProductService productService;
+    private final CategoryService categoryService;
     
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, CategoryService categoryService) {
+        this.categoryService = categoryService;
         this.productService = productService;
     }
 
@@ -36,6 +39,15 @@ public class ProductController {
         Product existingProduct = productService.getProductById(id);
         if (existingProduct == null) {
             return ResponseEntity.notFound().build();
+        }
+
+        // Kiểm tra xem category_id có tồn tại không
+        if (productDTO.getCategory() != null) {
+            Category category = categoryService.getCategoryById(productDTO.getCategory().getId());
+            if (category == null) {
+                return ResponseEntity.badRequest().body(null);
+            }
+            existingProduct.setCategory(category);
         }
 
         // Chỉ cập nhật các trường không null từ DTO
