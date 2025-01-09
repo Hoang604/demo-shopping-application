@@ -76,15 +76,17 @@ public class OrderItem {
     }
 
     public void setQuantity(int quantity) {
+        if (quantity < 0) {
+            throw new IllegalArgumentException("quantity cannot be negative");
+        }
         this.quantity = quantity;
     }
 
     public void setPrice(double price) {
+        if (price < 0) {
+            throw new IllegalArgumentException("price cannot be negative");
+        }
         this.price = price;
-    }
-
-    public double getTotalPrice() {
-        return this.price * this.quantity;
     }
 
     @Override

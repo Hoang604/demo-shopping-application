@@ -36,6 +36,9 @@ public class Order {
     }
 
     public Order(User user, double totalAmount, String status) {
+        if (totalAmount < 0) {
+            throw new IllegalArgumentException("totalAmount cannot be negative");
+        }
         this.user = user;
         this.orderDate = new java.sql.Timestamp(System.currentTimeMillis());
         this.totalAmount = totalAmount;
@@ -75,6 +78,9 @@ public class Order {
     }
 
     public void setTotalAmount(double totalAmount) {
+        if (totalAmount < 0) {
+            throw new IllegalArgumentException("totalAmount cannot be negative");
+        }
         this.totalAmount = totalAmount;
     }
 

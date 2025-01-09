@@ -58,22 +58,17 @@ public class Cart {
     @Column(name = "created_at")
     private Timestamp createdDate;
 
-    @Column(name = "total_amount")
-    private double totalAmount;
-
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> cartItems;
 
     public Cart() {
         this.user = null;
         this.createdDate = new Timestamp(System.currentTimeMillis());
-        this.totalAmount = 0;
     }
 
     public Cart(User user) {
         this.user = user;
         this.createdDate = new Timestamp(System.currentTimeMillis());
-        this.totalAmount = 0;
     }
 
     public int getId() {
@@ -101,11 +96,7 @@ public class Cart {
     }
 
     public double getTotalAmount() {
-        return totalAmount;
-    }
-
-    public void setTotalAmount(double totalAmount) {
-        this.totalAmount = totalAmount;
+        return cartItems.size();
     }
 
     public List<CartItem> getCartItems() {

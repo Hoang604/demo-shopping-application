@@ -24,9 +24,9 @@ public class Product {
     @Column(name = "image")
     private String image;
     @Column(name = "rating_rate")
-    private int ratingRate;
+    private double ratingRate;
     @Column(name = "rating_count")
-    private int ratingCount;
+    private double ratingCount;
 
     @ManyToOne
     @JoinColumn(name = "category_id", referencedColumnName = "id")
@@ -53,7 +53,20 @@ public class Product {
     }
     public Product(String title, String description, double price,
             Category category, String image, int ratingRate, int ratingCount) {
-        
+        if (price < 0) {
+            throw new IllegalArgumentException("price cannot be negative");
+        }
+        if (ratingRate < 0) {
+            throw new IllegalArgumentException("ratingRate cannot be negative");
+        }
+
+        if (ratingCount < 0) {
+            throw new IllegalArgumentException("ratingCount cannot be negative");
+        }
+
+        if (title == null) {
+            throw new IllegalArgumentException("title cannot be null");
+        }
         this.title = title;
         this.description = description;
         this.price = price;
@@ -76,6 +89,9 @@ public class Product {
     }
 
     public void setTitle(String title) {
+        if (title == null) {
+            throw new IllegalArgumentException("title cannot be null");
+        }
         this.title = title;
     }
 
@@ -92,6 +108,9 @@ public class Product {
     }
 
     public void setPrice(double price) {
+        if (price < 0) {
+            throw new IllegalArgumentException("price cannot be negative");
+        }
         this.price = price;
     }
 
@@ -103,19 +122,25 @@ public class Product {
         this.image = image;
     }
 
-    public int getRatingRate() {
+    public double getRatingRate() {
         return ratingRate;
     }
 
-    public void setRatingRate(int ratingRate) {
+    public void setRatingRate(double ratingRate) {
+        if (ratingRate < 0) {
+            throw new IllegalArgumentException("ratingRate cannot be negative");
+        }
         this.ratingRate = ratingRate;
     }
 
-    public int getRatingCount() {
+    public double getRatingCount() {
         return ratingCount;
     }
 
-    public void setRatingCount(int ratingCount) {
+    public void setRatingCount(double ratingCount) {
+        if (ratingCount < 0) {
+            throw new IllegalArgumentException("ratingCount cannot be negative");
+        }
         this.ratingCount = ratingCount;
     }
 

@@ -37,6 +37,9 @@ public class Category {
     }
 
     public void setName(String name) {
+        if (name == null) {
+            throw new IllegalArgumentException("name cannot be null");
+        }
         this.name = name;
     }
 }

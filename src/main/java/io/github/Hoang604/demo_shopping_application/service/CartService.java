@@ -1,6 +1,7 @@
 package io.github.Hoang604.demo_shopping_application.service;
 
 import java.util.Optional;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
@@ -14,20 +15,24 @@ public class CartService {
     public CartService(CartRepository cartRepository) {
         this.cartRepository = cartRepository;    }
 
-    public Cart newCart(Cart cart) {
+   public Cart createCart(Cart cart) {
         return cartRepository.save(cart);
-    }
-
-    public boolean isExist(int id) {
-        return cartRepository.existsById(id);
     }
 
     public Cart getCartById(int id) {
         return cartRepository.findById(id).orElse(null);
     }
 
-    public void updateCart(Cart cart) {
-        cartRepository.save(cart);
+    public Cart updateCart(Cart cart) {
+        return cartRepository.save(cart);
+    }
+
+    public void deleteCartById(int id) {
+        cartRepository.deleteById(id);
+    }
+
+    public List<Cart> getAllCarts() {
+        return cartRepository.findAll();
     }
 
     public void deleteAllCartItems(int cartId) {
