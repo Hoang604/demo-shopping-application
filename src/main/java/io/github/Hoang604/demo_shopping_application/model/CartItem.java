@@ -1,3 +1,8 @@
+/**
+ * Represents an item in the shopping cart.
+ * This class is part of the model in the demo shopping application.
+ * It is used to store information about a product added to the cart.
+ */
 package io.github.Hoang604.demo_shopping_application.model;
 
 import jakarta.persistence.Column;
@@ -38,20 +43,43 @@ public class CartItem {
         this.quantity = quantity;
     }
 
+    public int getId() {
+        return id;
+    }
+
     public void setId(int id) {
         this.id = id;
+    }
+
+    public Cart getCart() {
+        return cart;
     }
 
     public void setCart(Cart cart) {
         this.cart = cart;
     }
 
+    public Product getProduct() {
+        return product;
+    }
+
     public void setProduct(Product product) {
         this.product = product;
     }
 
+    public int getQuantity() {
+        return quantity;
+    }
+
     public void setQuantity(int quantity) {
+        if (quantity < 0) {
+            throw new IllegalArgumentException("quantity cannot be negative");
+        }
         this.quantity = quantity;
+    }
+
+    public double getTotalPrice() {
+        return this.quantity * this.product.getPrice();
     }
     
 }

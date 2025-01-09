@@ -1,35 +1,44 @@
 package io.github.Hoang604.demo_shopping_application.model;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Table;
 
-@Entity
+@Entity()
+@Table(name = "orders")
 public class Order {
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private int id;
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
+    @CreationTimestamp
     @Column(nullable = true, name = "order_date")
     private java.sql.Timestamp orderDate;
+    @Column(name = "total_amount")
+    private double totalAmount;
     @Column(nullable = true, name = "status")
     private String status;
 
     public Order() {
         this.user = null;
-        this.orderDate = null;
+        this.orderDate = new java.sql.Timestamp(System.currentTimeMillis());
+        this.totalAmount = 0;
         this.status = "";
     }
 
-    public Order(User user, java.sql.Timestamp orderDate, String status) {
+    public Order(User user, double totalAmount, String status) {
         this.user = user;
-        this.orderDate = orderDate;
+        this.orderDate = new java.sql.Timestamp(System.currentTimeMillis());
+        this.totalAmount = totalAmount;
         this.status = status;
     }
 
@@ -45,29 +54,37 @@ public class Order {
         return this.orderDate;
     }
 
+    public double getTotalAmount() {
+        return this.totalAmount;
+    }
+
     public String getStatus() {
         return this.status;
     }
 
-    public void updateUser(User user) {
-        if (user == null) {
-            throw new IllegalArgumentException("user cannot be null");
-        }
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setUser(User user) {
         this.user = user;
     }
 
-    public void updateOrderDate(java.sql.Timestamp orderDate) {
-        if (orderDate == null) {
-            throw new IllegalArgumentException("orderDate cannot be null");
-        }
+    public void setOrderDate(java.sql.Timestamp orderDate) {
         this.orderDate = orderDate;
     }
 
-    public void updateStatus(String status) {
-        if (status == null) {
-            throw new IllegalArgumentException("status cannot be null");
-        }
+    public void setTotalAmount(double totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public void setStatus(String status) {
         this.status = status;
+    }
+
+    @Override
+    public String toString() {
+        return this.id + " " + this.user.getId() + " " + this.orderDate + " " + this.totalAmount + " " + this.status;
     }
 
     public void printOrder() {

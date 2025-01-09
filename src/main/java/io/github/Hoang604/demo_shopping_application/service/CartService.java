@@ -1,17 +1,18 @@
 package io.github.Hoang604.demo_shopping_application.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
 import io.github.Hoang604.demo_shopping_application.repository.CartRepository;
 import io.github.Hoang604.demo_shopping_application.model.Cart;
-import io.github.Hoang604.demo_shopping_application.model.CartItem;
-import io.github.Hoang604.demo_shopping_application.repository.CartItemRepository;
 
+@Service
 public class CartService {
-    @Autowired
-    private CartRepository cartRepository;
+    private final CartRepository cartRepository;
 
-    @Autowired
-    private CartItemRepository cartItemRepository;
+    public CartService(CartRepository cartRepository) {
+        this.cartRepository = cartRepository;    }
 
     public Cart newCart(Cart cart) {
         return cartRepository.save(cart);
@@ -29,19 +30,14 @@ public class CartService {
         cartRepository.save(cart);
     }
 
-    public CartItem newCartItem(CartItem item) {
-        return cartItemRepository.save(item);
-    }
-
-    public CartItem updateCartItem(CartItem item) {
-        return cartItemRepository.save(item);
-    }
-
-    public void deleteCartItemById(int id) {
-        cartItemRepository.deleteById(id);
-    }
-
-    public void deleteAllCartItems() {
-        cartItemRepository.deleteAll();
+    public void deleteAllCartItems(int cartId) {
+        Optional<Cart> optionalCart = cartRepository.findById(cartId);
+        if (optionalCart.isPresent()) {
+            Cart cart = optionalCart.get();
+            cart.getCartItems().clear();
+            cartRepository.save(cart);
+        } else {
+            throw new RuntimeException("Cart not found");
+        }
     }
 }

@@ -5,6 +5,4 @@ import org.springframework.stereotype.Repository;
 import io.github.Hoang604.demo_shopping_application.model.OrderItem;
 
 @Repository
-public interface OrderItemRepository extends JpaRepository<OrderItem, Integer> {
-    
-}
+public interface OrderItemRepository extends JpaRepository<OrderItem, Integer> {}

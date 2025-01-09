@@ -7,5 +7,5 @@ import io.github.Hoang604.demo_shopping_application.model.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
-    
+    public User findByUsername(String username);
 }

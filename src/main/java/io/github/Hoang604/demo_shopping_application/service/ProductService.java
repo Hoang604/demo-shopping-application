@@ -1,14 +1,19 @@
 package io.github.Hoang604.demo_shopping_application.service;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import io.github.Hoang604.demo_shopping_application.model.Product;
 import io.github.Hoang604.demo_shopping_application.repository.ProductRepository;
 
+
+@Service
 public class ProductService {
-    @Autowired
     private ProductRepository productRepository;
+
+    public ProductService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
 
     public Product saveProduct(Product product) {
         return productRepository.save(product);
@@ -38,10 +43,6 @@ public class ProductService {
         productRepository.save(product);
     }
 
-    public List<Product> getProductsByCategory(String category) {
-        return productRepository.findByCategory(category);
-    }
-
     public List<Product> getProductsByTitle(String title) {
         return productRepository.findByTitle(title);
     }
@@ -58,9 +59,9 @@ public class ProductService {
         return productRepository.findByRatingRate(ratingRate);
     }
 
-    public List<Product> getProductsByRatingRateRange(int minRatingRate, int maxRatingRate) {
-        return productRepository.findbyRatingRateBetween(minRatingRate, maxRatingRate);
-    }
+    // public List<Product> getProductsByRatingRateRange(int minRatingRate, int maxRatingRate) {
+    //     return productRepository.findbyRatingRateBetween(minRatingRate, maxRatingRate);
+    // }
 
     public List<Product> getProductsByRatingCount(int ratingCount) {
         return productRepository.findByRatingCount(ratingCount);
@@ -68,17 +69,5 @@ public class ProductService {
 
     public List<Product> getProductsByRatingCountRange(int minRatingCount, int maxRatingCount) {
         return productRepository.findByRatingCountBetween(minRatingCount, maxRatingCount);
-    }
-
-    public List<Product> getProductsByCategoryAndPriceRange(String category, double minPrice, double maxPrice) {
-        return productRepository.findByCategoryAndPriceBetween(category, minPrice, maxPrice);
-    }
-
-    public List<Product> getProductsByCategoryAndRatingRateRange(String category, int minRatingRate, int maxRatingRate) {
-        return productRepository.findByCategoryAndRatingRateBetween(category, minRatingRate, maxRatingRate);
-    }
-
-    public List<Product> getProductsByCategoryAndRatingRateRange(String category, double minRatingRate, double maxRatingRate) {
-        return productRepository.findByCategoryAndRatingRateBetween(category, minRatingRate, maxRatingRate);
     }
 }

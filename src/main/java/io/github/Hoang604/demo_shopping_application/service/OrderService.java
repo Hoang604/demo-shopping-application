@@ -2,17 +2,26 @@ package io.github.Hoang604.demo_shopping_application.service;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import io.github.Hoang604.demo_shopping_application.model.Order;
+import io.github.Hoang604.demo_shopping_application.model.OrderItem;
 import io.github.Hoang604.demo_shopping_application.repository.OrderRepository;
+import io.github.Hoang604.demo_shopping_application.repository.OrderItemRepository;
 
+
+@Service
 public class OrderService {
-    @Autowired
-    private OrderRepository orderRepository;
+    private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository; 
 
-    public void saveOrder(Order order) {
-        orderRepository.save(order);
+    public OrderService(OrderRepository orderRepository, OrderItemRepository orderItemService) {
+        this.orderRepository = orderRepository;
+        this.orderItemRepository = orderItemService;
+    }
+
+    public void saveOrder(OrderItem order) {
+        orderItemRepository.save(order);
     }
 
     public void saveAllOrder(List<Order> orders) {
@@ -33,9 +42,5 @@ public class OrderService {
 
     public void deleteAllOrders() {
         orderRepository.deleteAll();
-    }
-
-    public void updateOrder(Order order) {
-        orderRepository.save(order);
     }
 }

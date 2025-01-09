@@ -2,9 +2,19 @@ package io.github.Hoang604.demo_shopping_application.model;
 
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Entity;
+import java.sql.Timestamp;
 
+
+@Entity
+@Table(name = "users")
 public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
@@ -19,21 +29,33 @@ public class User {
     @Column(nullable = false, name = "role")
     private String role;
 
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private Timestamp createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private Timestamp updatedAt;
+
     public User() {
         this.username = "";
         this.password = "";
         this.phoneNumber = "";
         this.role = "";
+        this.createdAt = new Timestamp(System.currentTimeMillis());
+        this.updatedAt = new Timestamp(System.currentTimeMillis());
     }
 
     public User(String username, String password, String phoneNumber, String role) {
-        if (role == null || (!role.equals("admin") && !role.equals("customer"))) {
-            throw new IllegalArgumentException("role must be either 'admin' or 'customer'");
+        if (role == null || (!role.equals("admin") && !role.equals("user"))) {
+            throw new IllegalArgumentException("role must be either 'admin' or 'user'");
         }
         this.username = username;
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.role = role;
+        this.createdAt = new Timestamp(System.currentTimeMillis());
+        this.updatedAt = new Timestamp(System.currentTimeMillis());
     }
 
     public int getId() {
@@ -69,8 +91,8 @@ public class User {
     }
 
     public void setRole(String role) {
-        if (role == null || (!role.equals("admin") && !role.equals("customer"))) {
-            throw new IllegalArgumentException("role must be either 'admin' or 'customer'");
+        if (role == null || (!role.equals("admin") && !role.equals("user"))) {
+            throw new IllegalArgumentException("role must be either 'admin' or 'user'");
         }
         this.role = role;
     }

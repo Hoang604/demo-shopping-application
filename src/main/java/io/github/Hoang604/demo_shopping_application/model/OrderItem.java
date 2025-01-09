@@ -1,12 +1,16 @@
 package io.github.Hoang604.demo_shopping_application.model;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
+@Entity
+@Table(name = "order_items")
 public class OrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
@@ -81,5 +85,10 @@ public class OrderItem {
 
     public double getTotalPrice() {
         return this.price * this.quantity;
+    }
+
+    @Override
+    public String toString() {
+        return this.id + " " + this.order.getId() + " " + this.product.getId() + " " + this.quantity + " " + this.price;
     }
 }
