@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+            cursor: pointer; /* Thay đổi con trỏ chuột khi di chuột qua hàng */
+        }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        .create-button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-bottom: 20px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        .create-button:hover {
+            background-color: #555;
+        }
+    </style>
+    <script>
+        // JavaScript để làm cho toàn bộ hàng có thể nhấp được
+        document.addEventListener('DOMContentLoaded', function() {
+            var rows = document.querySelectorAll('tr[data-href]');
+            rows.forEach(function(row) {
+                row.addEventListener('click', function() {
+                    window.location.href = row.getAttribute('data-href');
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <header>
+        <h1>User List</h1>
+    </header>
+    <main>
+        <a href="/api/users/new" class="create-button">Create New User</a>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Phone Number</th>
+                    <th>Role</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Sử dụng Thymeleaf để lặp qua danh sách người dùng và hiển thị chúng -->
+                <tr th:each="user : ${users}" th:attr="data-href=@{/api/users/{id}(id=${user.id})}">
+                    <td th:text="${user.id}">1</td>
+                    <td th:text="${user.username}">Username</td>
+                    <td th:text="${user.password}">Password</td>
+                    <td th:text="${user.phoneNumber}">Phone number</td>
+                    <td th:text="${user.role}">Role</td>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+    <footer>
+        <p>&copy; 2023 Demo Shopping Application</p>
+    </footer>
+</body>
+</html>

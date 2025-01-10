@@ -4,11 +4,14 @@ import io.github.Hoang604.demo_shopping_application.model.User;
 import io.github.Hoang604.demo_shopping_application.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import org.springframework.ui.Model;
 import io.github.Hoang604.demo_shopping_application.dto.UpdateUserDTO;
+import org.springframework.stereotype.Controller;
 
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping("/api/users")
 public class UserController {
 
@@ -19,29 +22,43 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
+    public String getAllUsers(Model model) {
         List<User> users = userService.getAllUsers();
-        return ResponseEntity.ok(users);
+        model.addAttribute("users", users);
+        return "users";
     }
 
-    @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
+    @PostMapping(consumes = "application/json")
+    public String createUser(@RequestBody User user, Model model) {
         User newUser = userService.createUser(user);
-        return ResponseEntity.ok(newUser);
+        model.addAttribute("message", "User created successfully!");
+        return "redirect:/api/users";
+    }
+
+    @GetMapping("/new")
+    public String showCreateUserForm(Model model) {
+        model.addAttribute("user", new User());
+        return "create-user";
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable int id) {
+    public String getUserById(@PathVariable int id, Model model) {
         User user = userService.getUserById(id);
-        return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
+        if (user == null) {
+            return "error/404";
+        }
+        model.addAttribute("user", user);
+        return "user";
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable int id, @RequestBody UpdateUserDTO userDTO) {
+    public ResponseEntity<Void> updateUser(@PathVariable int id, @RequestBody UpdateUserDTO userDTO) {
         User existingUser = userService.getUserById(id);
         if (existingUser == null) {
             return ResponseEntity.notFound().build();
         }
+
+        userDTO.print();
     
         // Chỉ cập nhật các trường không null từ DTO
         if (userDTO.getUsername() != null) {
@@ -57,10 +74,10 @@ public class UserController {
             existingUser.setRole(userDTO.getRole());
         }
     
-        User updatedUser = userService.updateUser(existingUser);
-        return ResponseEntity.ok(updatedUser);
+        userService.updateUser(existingUser);
+        return ResponseEntity.noContent().build();
     }
-
+    
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUserById(@PathVariable int id) {
         if (userService.getUserById(id) == null) {

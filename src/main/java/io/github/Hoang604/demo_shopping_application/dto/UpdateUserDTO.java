@@ -38,4 +38,11 @@ public class UpdateUserDTO {
     public void setRole(String role) {
         this.role = role;
     }
+
+    public void print() {
+        System.out.println("Username: " + username);
+        System.out.println("Password: " + password);
+        System.out.println("Phone number: " + phoneNumber);
+        System.out.println("Role: " + role);
+    }
 }

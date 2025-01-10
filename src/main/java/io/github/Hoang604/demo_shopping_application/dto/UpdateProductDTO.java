@@ -11,7 +11,7 @@ public class UpdateProductDTO {
 
     private Double ratingRate;
 
-    private Double ratingCount;
+    private Integer ratingCount;
 
     private String image;
 
@@ -49,11 +49,11 @@ public class UpdateProductDTO {
         this.ratingRate = ratingRate;
     }
 
-    public Double getRatingCount() {
+    public Integer getRatingCount() {
         return ratingCount;
     }
 
-    public void setRatingCount(Double ratingCount) {
+    public void setRatingCount(Integer ratingCount) {
         this.ratingCount = ratingCount;
     }
 
@@ -71,5 +71,15 @@ public class UpdateProductDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public void print() {
+        System.out.println("title: " + title);
+        System.out.println("price: " + price);
+        System.out.println("category: " + category);
+        System.out.println("ratingRate: " + ratingRate);
+        System.out.println("ratingCount: " + ratingCount);
+        System.out.println("image: " + image);
+        System.out.println("description: " + description);
     }
 }

@@ -26,7 +26,7 @@ public class Product {
     @Column(name = "rating_rate")
     private double ratingRate;
     @Column(name = "rating_count")
-    private double ratingCount;
+    private int ratingCount;
 
     @ManyToOne
     @JoinColumn(name = "category_id", referencedColumnName = "id")
@@ -133,11 +133,11 @@ public class Product {
         this.ratingRate = ratingRate;
     }
 
-    public double getRatingCount() {
+    public int getRatingCount() {
         return ratingCount;
     }
 
-    public void setRatingCount(double ratingCount) {
+    public void setRatingCount(int ratingCount) {
         if (ratingCount < 0) {
             throw new IllegalArgumentException("ratingCount cannot be negative");
         }

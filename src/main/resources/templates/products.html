@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .product-item {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            text-decoration: none;
+            color: inherit;
+        }
+        .product-item img {
+            max-width: 100px;
+            margin-right: 20px;
+        }
+        .product-details {
+            display: flex;
+            flex-direction: column;
+        }
+        .product-details h2 {
+            margin: 0;
+            font-size: 1.2em;
+        }
+        .product-details p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Product List</h1>
+    </header>
+    <main>
+        <section id="products">
+            <ul>
+                <!-- Sử dụng Thymeleaf để lặp qua danh sách sản phẩm và hiển thị chúng -->
+                <li th:each="product : ${products}">
+                    <a th:href="@{/api/products/{id}(id=${product.id})}" class="product-item">
+                        <img th:src="${product.image}" alt="Product Image">
+                        <div class="product-details">
+                            <h2 th:text="${product.title}">Product Title</h2>
+                            <p>Price: <span th:text="${product.price}">0.00</span></p>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2023 Shopping Application</p>
+    </footer>
+</body>
+</html>

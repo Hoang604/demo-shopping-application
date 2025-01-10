@@ -5,12 +5,15 @@ import io.github.Hoang604.demo_shopping_application.model.Category;
 import io.github.Hoang604.demo_shopping_application.model.Product;
 import io.github.Hoang604.demo_shopping_application.service.ProductService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import org.springframework.ui.Model;
 import io.github.Hoang604.demo_shopping_application.service.CategoryService;
 
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping("/api/products")
 public class ProductController {
 
@@ -22,6 +25,13 @@ public class ProductController {
         this.productService = productService;
     }
 
+    @GetMapping
+    public String getAllProducts(Model model) {
+        List<Product> products = productService.getAllProducts();
+        model.addAttribute("products", products);
+        return "products"; // Trả về tên của file HTML
+    }
+
     @PostMapping
     public ResponseEntity<Product> createProduct(@RequestBody Product product) {
         Product newProduct = productService.createProduct(product);
@@ -29,9 +39,13 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable int id) {
+    public String getProductById(@PathVariable int id, Model model) {
         Product product = productService.getProductById(id);
-        return product != null ? ResponseEntity.ok(product) : ResponseEntity.notFound().build();
+        if (product == null) {
+            return "error/404"; // Trả về trang lỗi nếu sản phẩm không tồn tại
+        }
+        model.addAttribute("product", product);
+        return "product"; // Trả về tên của file HTML
     }
 
     @PutMapping("/{id}")
@@ -78,12 +92,6 @@ public class ProductController {
         }
         productService.deleteProductById(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts() {
-        List<Product> products = productService.getAllProducts();
-        return ResponseEntity.ok(products);
     }
 
     @GetMapping("/search")

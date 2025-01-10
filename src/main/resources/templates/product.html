@@ -1,1 +1,95 @@
- 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details</title>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2px;
+            padding: 0px;
+            background-color: #fff;
+        }
+        header {
+            background-color: #081c2c;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+        }
+        main {
+            padding: 20px;
+            width: 98vw;
+            margin: 0; /* Loại bỏ khoảng cách ở hai bên */
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .product-item {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding: 20px 0;
+        }
+        .product-item img {
+            max-width: 200px;
+            margin-right: 20px;
+        }
+        .product-details {
+            display: flex;
+            flex-direction: column;
+        }
+        .product-details h2 {
+            margin: 0;
+            font-size: 2em;
+            color: #333;
+        }
+        .product-details p {
+            margin: 10px 0;
+            color: #666;
+        }
+        .product-details .price, .product-details .rating {
+            font-size: 1.4em;
+            color: #000000;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            width: fit-content;
+        }
+        .product-details .rating {
+            font-size: 1.2em;
+            color: #f39c12;
+        }
+        footer {
+            text-align: center;
+            padding: 10px 0;
+            background-color: #081c2c;
+            color: #fff;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Product Details</h1>
+    </header>
+    <main>
+        <div class="product-item">
+            <img th:src="${product.image}" alt="Product Image">
+            <div class="product-details">
+                <h2 th:text="${product.title}">Product Title</h2>
+                <p th:text="${product.description}">Product Description</p>
+                <p class="price">Price: $<span th:text="${product.price}">0.00</span></p>
+                <p class="rating">Rating: <span th:text="${product.ratingRate}">0.0</span> (<span th:text="${product.ratingCount}">0</span> Rates)</p>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2023 Shopping Application</p>
+    </footer>
+</body>
+</html>
