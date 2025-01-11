@@ -2,6 +2,8 @@ package io.github.Hoang604.demo_shopping_application.controller;
 
 import io.github.Hoang604.demo_shopping_application.model.User;
 import io.github.Hoang604.demo_shopping_application.service.UserService;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,10 +31,9 @@ public class UserController {
     }
 
     @PostMapping(consumes = "application/json")
-    public String createUser(@RequestBody User user, Model model) {
-        User newUser = userService.createUser(user);
-        model.addAttribute("message", "User created successfully!");
-        return "redirect:/api/users";
+    public ResponseEntity<Void> createUser(@RequestBody User user) {
+        userService.createUser(user);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/new")

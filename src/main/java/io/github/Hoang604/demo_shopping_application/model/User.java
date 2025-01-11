@@ -94,7 +94,7 @@ public class User {
     }
 
     public String getRole() {
-        return role;
+        return role.toUpperCase();
     }
 
     public Timestamp getCreatedAt() {
