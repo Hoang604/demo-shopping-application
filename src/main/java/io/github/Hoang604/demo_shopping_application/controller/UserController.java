@@ -23,6 +23,7 @@ public class UserController {
         this.userService = userService;
     }
 
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping
     public String getAllUsers(Model model) {
         List<User> users = userService.getAllUsers();
@@ -30,18 +31,21 @@ public class UserController {
         return "users";
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(consumes = "application/json")
     public ResponseEntity<Void> createUser(@RequestBody User user) {
         userService.createUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @GetMapping("/new")
     public String showCreateUserForm(Model model) {
         model.addAttribute("user", new User());
         return "create-user";
     }
 
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{id}")
     public String getUserById(@PathVariable int id, Model model) {
         User user = userService.getUserById(id);
@@ -52,6 +56,7 @@ public class UserController {
         return "user";
     }
 
+    @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateUser(@PathVariable int id, @RequestBody UpdateUserDTO userDTO) {
         User existingUser = userService.getUserById(id);
@@ -62,23 +67,24 @@ public class UserController {
         userDTO.print();
     
         // Chỉ cập nhật các trường không null từ DTO
-        if (userDTO.getUsername() != null) {
-            existingUser.setUsername(userDTO.getUsername());
+        if (userDTO.username() != null) {
+            existingUser.setUsername(userDTO.username());
         }
-        if (userDTO.getPassword() != null) {
-            existingUser.setPassword(userDTO.getPassword());
+        if (userDTO.password() != null) {
+            existingUser.setPassword(userDTO.password());
         }
-        if (userDTO.getPhoneNumber() != null) {
-            existingUser.setPhoneNumber(userDTO.getPhoneNumber());
+        if (userDTO.phoneNumber() != null) {
+            existingUser.setPhoneNumber(userDTO.phoneNumber());
         }
-        if (userDTO.getRole() != null) {
-            existingUser.setRole(userDTO.getRole());
+        if (userDTO.role() != null) {
+            existingUser.setRole(userDTO.role());
         }
     
         userService.updateUser(existingUser);
         return ResponseEntity.noContent().build();
     }
     
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUserById(@PathVariable int id) {
         if (userService.getUserById(id) == null) {

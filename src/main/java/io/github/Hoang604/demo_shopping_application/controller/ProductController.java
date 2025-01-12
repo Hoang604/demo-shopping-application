@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.ui.Model;
 import io.github.Hoang604.demo_shopping_application.service.CategoryService;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
@@ -25,6 +26,7 @@ public class ProductController {
         this.productService = productService;
     }
 
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping
     public String getAllProducts(Model model) {
         List<Product> products = productService.getAllProducts();
@@ -32,12 +34,14 @@ public class ProductController {
         return "products"; // Trả về tên của file HTML
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public ResponseEntity<Product> createProduct(@RequestBody Product product) {
         Product newProduct = productService.createProduct(product);
         return ResponseEntity.ok(newProduct);
     }
 
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{id}")
     public String getProductById(@PathVariable int id, Model model) {
         Product product = productService.getProductById(id);
@@ -48,6 +52,7 @@ public class ProductController {
         return "product"; // Trả về tên của file HTML
     }
 
+    @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{id}")
     public ResponseEntity<Product> updateProduct(@PathVariable int id, @RequestBody UpdateProductDTO productDTO) {
         Product existingProduct = productService.getProductById(id);
@@ -56,8 +61,8 @@ public class ProductController {
         }
 
         // Kiểm tra xem category_id có tồn tại không
-        if (productDTO.getCategory() != null) {
-            Category category = categoryService.getCategoryById(productDTO.getCategory().getId());
+        if (productDTO.category() != null) {
+            Category category = categoryService.getCategoryById(productDTO.category().getId());
             if (category == null) {
                 return ResponseEntity.badRequest().body(null);
             }
@@ -65,26 +70,27 @@ public class ProductController {
         }
 
         // Chỉ cập nhật các trường không null từ DTO
-        if (productDTO.getTitle() != null) {
-            existingProduct.setTitle(productDTO.getTitle());
+        if (productDTO.title() != null) {
+            existingProduct.setTitle(productDTO.title());
         }
-        if (productDTO.getPrice() != null) {
-            existingProduct.setPrice(productDTO.getPrice());
+        if (productDTO.price() != null) {
+            existingProduct.setPrice(productDTO.price());
         }
-        if (productDTO.getCategory() != null) {
-            existingProduct.setCategory(productDTO.getCategory());
+        if (productDTO.category() != null) {
+            existingProduct.setCategory(productDTO.category());
         }
-        if (productDTO.getRatingRate() != null) {
-            existingProduct.setRatingRate(productDTO.getRatingRate());
+        if (productDTO.ratingRate() != null) {
+            existingProduct.setRatingRate(productDTO.ratingRate());
         }
-        if (productDTO.getRatingCount() != null) {
-            existingProduct.setRatingCount(productDTO.getRatingCount());
+        if (productDTO.ratingCount() != null) {
+            existingProduct.setRatingCount(productDTO.ratingCount());
         }
 
         Product updatedProduct = productService.updateProduct(existingProduct);
         return ResponseEntity.ok(updatedProduct);
     }
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProductById(@PathVariable int id) {
         if (productService.getProductById(id) == null) {
@@ -94,6 +100,7 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping("/search")
     public ResponseEntity<List<Product>> searchProducts(
             @RequestParam(required = false) String title,

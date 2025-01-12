@@ -8,15 +8,23 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import io.github.Hoang604.demo_shopping_application.service.UserService;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    private final UserService userService;
+
+    public SecurityConfig(UserService userService) {
+        this.userService = userService;
+    }
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(authorizeRequests ->
                 authorizeRequests
-                    .requestMatchers("/", "/login**", "/error**", "/api/products", "/index").permitAll()
+                    .requestMatchers("/**", "/login**", "/error**", "/api/products").permitAll()
                     .requestMatchers("/admin/**").hasRole("ADMIN")
                     .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
                     .anyRequest().authenticated()
@@ -24,17 +32,15 @@ public class SecurityConfig {
             .oauth2Login(oauth2Login ->
                 oauth2Login
                     .loginPage("/login")
-                    .defaultSuccessUrl("/api/products")
             )
             .formLogin(formLogin ->
                 formLogin
                     .loginPage("/login")
-                    .defaultSuccessUrl("/api/users")
             )
             .logout(logout ->
                 logout
                     .logoutSuccessUrl("/")
-            );
+            ).userDetailsService(userService::loadUserByUsername);
         return http.build();
     }
 
