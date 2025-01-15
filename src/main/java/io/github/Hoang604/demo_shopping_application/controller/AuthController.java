@@ -1,13 +1,12 @@
 package io.github.Hoang604.demo_shopping_application.controller;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 public class AuthController {
-
-    @GetMapping("/login")
-    public String login() {
-        return "login"; // Trả về tên của view login.html
+    @PostMapping("/register") 
+    public String register() {
+        return "register"; // Trả về tên của view register.html
     }
 }

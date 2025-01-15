@@ -129,7 +129,27 @@
                 });
             });
         }
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoutButton = document.querySelector('a[href="/logout"]');
+            if (logoutButton) {
+                logoutButton.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    Swal.fire({
+                        title: 'Are you sure you want to logout?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, logout',
+                        cancelButtonText: 'Cancel'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '/logout';
+                        }
+                    });
+                });
+            }
+        });
     </script>
+    
 </head>
 <body>
     <header>
@@ -158,6 +178,8 @@
                     <button type="button" th:onclick="'deleteUser(' + ${user.id} + ')'">Delete User</button>
                 </div>
             </form>
+            <a href="/api/users" class="back-button">&larr;</a>
+            <a href="/logout" class="logout-button">Logout</a>
         </div>
     </main>
     <footer>

@@ -1,9 +1,13 @@
+/*
+ * This class is used to create a UserDetailsService object that will be used to authenticate users
+ */
+
 package io.github.Hoang604.demo_shopping_application.service;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import io.github.Hoang604.demo_shopping_application.model.User;
-import io.github.Hoang604.demo_shopping_application.model.UserDetail;
+import io.github.Hoang604.demo_shopping_application.model.MyUserDetails;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,13 +25,20 @@ public class MyUserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) {
-        User user = userRepository.findByUsername(username);
+        User user = null;
+        if (username.matches("\\d+")) { // Biểu thức chính quy để kiểm tra số
+            user = userRepository.findByPhoneNumber(username);
+        }
+
+        else {
+            user = userRepository.findByUsername(username);
+        }
 
         if (user == null) {
             throw new UsernameNotFoundException("User not found");
         }
 
-        return new UserDetail(user);
+        return new MyUserDetails(user, username);
 
     }
     

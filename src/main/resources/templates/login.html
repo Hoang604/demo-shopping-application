@@ -1,0 +1,142 @@
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f2f2;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+    .login-container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        width: 300px;
+        position: relative;
+    }
+    .login-container h2 {
+        margin-top: 0;
+        text-align: center;
+    }
+    .input-group {
+        margin-bottom: 15px;
+    }
+    .input-group label {
+        display: block;
+        margin-bottom: 5px;
+    }
+    .input-group input[type="text"],
+    .input-group input[type="password"] {
+        width: 100%;
+        padding: 8px;
+        box-sizing: border-box;
+    }
+    .input-group input[type="checkbox"] {
+        margin-top: 10px;
+    }
+    .error-message {
+        color: red;
+        text-align: center;
+    }
+    .back-button {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+    }
+    .oauth-login {
+        text-align: center;
+        margin-top: 10px;
+    }
+    .oauth-login img {
+        width: 20px;
+        vertical-align: middle;
+        margin-right: 5px;
+    }
+    .oauth-login a {
+        display: inline-block;
+        margin-top: 10px;
+    }
+    .login-button {
+        display: flex;
+        justify-content: center;
+    }
+    .login-button button {
+        background-color: #677568;
+        color: rgb(255, 255, 255);
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    .login-button button:hover {
+        background-color: #677568;
+    }
+    .register-link {
+        text-align: center;
+        margin-top: 15px;
+    }
+    .back-button {
+            font-size: 35px;
+            font-weight: bold; /* Hoặc font-weight: bold; */
+    }
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('show-password').addEventListener('change', function() {
+            var passwordInput = document.getElementById('password');
+            if (this.checked) {
+                passwordInput.type = 'text';
+            } else {
+                passwordInput.type = 'password';
+            }
+        });
+    });
+</script>
+</head>
+<body>
+    <div class="login-container">
+        <button class="back-button" onclick="window.location.href='/home'">&larr;</button>
+        <h2>Login</h2>
+        <form action="/login" method="post">
+            <div class="input-group">
+                <label for="username">Username or Phone Number:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+                <input type="checkbox" id="show-password"> Show Password
+            </div>
+            <div class="login-button">
+                <button type="submit">Login</button>
+            </div>
+            <div class="oauth-login">
+                <a href="/oauth2/authorization/google">
+                    <img src="../images/logo/google-logo.png" alt="Google Logo">Login with Google
+                </a>
+            </div>
+            <div class="oauth-login">
+                <a href="/oauth2/authorization/github">
+                    <img src="../images/logo/github-logo.png" alt="GitHub Logo">Login with GitHub
+                </a>
+            </div>
+        </form>
+        <div class="register-link">
+            <a href="/register">Don't have an account? Sign up now.</a>
+        </div>
+        <div class="error-message">
+            <!-- Display error message if login failed -->
+            <th:block th:if="${param.error}">
+                Invalid username or password.
+            </th:block>
+        </div>
+    </div>
+</body>
+</html>

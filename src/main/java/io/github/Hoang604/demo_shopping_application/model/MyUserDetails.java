@@ -7,12 +7,14 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-public class UserDetail implements UserDetails {
+public class MyUserDetails implements UserDetails {
     
-    private User user;
+    private final User user;
+    private final String inputUsername;
 
-    public UserDetail(User user) {
+    public MyUserDetails(User user, String inputUsername) {
         this.user = user;
+        this.inputUsername = inputUsername;
     }
 
     @Override
@@ -27,6 +29,9 @@ public class UserDetail implements UserDetails {
 
     @Override
     public String getUsername() {
+        if (inputUsername.matches("\\d+")) {
+            return user.getPhoneNumber();
+        }
         return user.getUsername();
     }
     

@@ -2,6 +2,8 @@ package io.github.Hoang604.demo_shopping_application.service;
 
 import io.github.Hoang604.demo_shopping_application.model.User;
 import io.github.Hoang604.demo_shopping_application.repository.UserRepository;
+
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,6 +18,8 @@ public class UserService{
     }
 
     public User createUser(User user) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+        user.setPassword(encoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 

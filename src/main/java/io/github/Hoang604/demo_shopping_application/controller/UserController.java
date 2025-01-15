@@ -31,14 +31,12 @@ public class UserController {
         return "users";
     }
 
-    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(consumes = "application/json")
     public ResponseEntity<Void> createUser(@RequestBody User user) {
         userService.createUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @ResponseStatus(HttpStatus.CREATED)
     @GetMapping("/new")
     public String showCreateUserForm(Model model) {
         model.addAttribute("user", new User());
