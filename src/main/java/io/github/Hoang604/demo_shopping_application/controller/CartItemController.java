@@ -4,11 +4,12 @@ import io.github.Hoang604.demo_shopping_application.model.CartItem;
 import io.github.Hoang604.demo_shopping_application.service.CartItemService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.ui.Model;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/cart-items")
+@RequestMapping("/users/{userId}/cart")
 public class CartItemController {
 
     private final CartItemService cartItemService;
@@ -17,35 +18,48 @@ public class CartItemController {
         this.cartItemService = cartItemService;
     }
 
-    @PostMapping
-    public ResponseEntity<CartItem> createCartItem(@RequestBody CartItem cartItem) {
-        CartItem newCartItem = cartItemService.newCartItem(cartItem);
-        return ResponseEntity.ok(newCartItem);
+    // get all cart items
+    @GetMapping
+    public String getCart(Model model) {
+        List<CartItem> cartItems = cartItemService.getAllCartItems();
+        model.addAttribute("cartItems", cartItems);
+        return "cart";
     }
 
+    // add new cart item to cart
+    @PostMapping
+    public String createCartItem(@RequestBody CartItem cartItem, Model model) {
+        CartItem newCartItem = cartItemService.newCartItem(cartItem);
+        model.addAttribute("cartItem", newCartItem);
+        return "cart-item-created";
+    }
+
+    // get cart item by id from cart (use for display detail of cart item)
     @GetMapping("/{id}")
-    public ResponseEntity<CartItem> getCartItemById(@PathVariable int id) {
+    public String getCartItemById(@PathVariable int id, Model model) {
         CartItem cartItem = cartItemService.getCartItemById(id);
-        return cartItem != null ? ResponseEntity.ok(cartItem) : ResponseEntity.notFound().build();
+        model.addAttribute("cartItem", cartItem);
+        return "cart-item";
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CartItem> updateCartItem(@PathVariable int id, @RequestBody CartItem cartItem) {
+    public String updateCartItem(@PathVariable int id, @RequestBody CartItem cartItem, Model model) {
         if (cartItemService.getCartItemById(id) == null) {
-            return ResponseEntity.notFound().build();
+            return "error/404";
         }
         cartItem.setId(id);
-        CartItem updatedCartItem = cartItemService.updateCartItem(cartItem);
-        return ResponseEntity.ok(updatedCartItem);
+        cartItemService.updateCartItem(cartItem);
+        model.addAttribute("message", "Cart item updated successfully");
+        return "redirect:/users/{userId}/cart/" + id;
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCartItemById(@PathVariable int id) {
+    public String deleteCartItemById(@PathVariable int id, Model model) {
         if (cartItemService.getCartItemById(id) == null) {
-            return ResponseEntity.notFound().build();
+            return "error/404";
         }
         cartItemService.deleteCartItemById(id);
-        return ResponseEntity.noContent().build();
+        return "redirect:/users/{userId}/cart";
     }
 
     @GetMapping

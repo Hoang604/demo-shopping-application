@@ -4,44 +4,38 @@ import io.github.Hoang604.demo_shopping_application.dto.UpdateProductDTO;
 import io.github.Hoang604.demo_shopping_application.model.Category;
 import io.github.Hoang604.demo_shopping_application.model.Product;
 import io.github.Hoang604.demo_shopping_application.service.ProductService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.ui.Model;
-import io.github.Hoang604.demo_shopping_application.service.CategoryService;
-import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
 @Controller
-@RequestMapping("/api/products")
+@RequestMapping("/products")
 public class ProductController {
 
     private final ProductService productService;
-    private final CategoryService categoryService;
     
-    public ProductController(ProductService productService, CategoryService categoryService) {
-        this.categoryService = categoryService;
+    public ProductController(ProductService productService) {
         this.productService = productService;
     }
 
-    @ResponseStatus(HttpStatus.OK)
     @GetMapping
     public String getAllProducts(Model model) {
         List<Product> products = productService.getAllProducts();
+        // Thêm danh sách sản phẩm vào model (model chứa các thuộc tính mà bạn muốn render trong view)
         model.addAttribute("products", products);
-        return "products"; // Trả về tên của file HTML
+        return "product/products";
     }
 
-    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public ResponseEntity<Product> createProduct(@RequestBody Product product) {
+    public String createProduct(@RequestBody Product product, Model model) {
         Product newProduct = productService.createProduct(product);
-        return ResponseEntity.ok(newProduct);
+        model.addAttribute("product", newProduct);
+        return "product/product";
     }
 
-    @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{id}")
     public String getProductById(@PathVariable int id, Model model) {
         Product product = productService.getProductById(id);
@@ -49,60 +43,31 @@ public class ProductController {
             return "error/404"; // Trả về trang lỗi nếu sản phẩm không tồn tại
         }
         model.addAttribute("product", product);
-        return "product"; // Trả về tên của file HTML
+        return "product/product";
     }
 
-    @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable int id, @RequestBody UpdateProductDTO productDTO) {
-        Product existingProduct = productService.getProductById(id);
-        if (existingProduct == null) {
-            return ResponseEntity.notFound().build();
+    public String updateProduct(@PathVariable int id, @RequestBody UpdateProductDTO productDTO, Model model) {
+        Product updatedProduct = productService.updateProduct(id, productDTO);
+        if (updatedProduct == null) {
+            return "error/product-not-exist";
         }
-
-        // Kiểm tra xem category_id có tồn tại không
-        if (productDTO.category() != null) {
-            Category category = categoryService.getCategoryById(productDTO.category().getId());
-            if (category == null) {
-                return ResponseEntity.badRequest().body(null);
-            }
-            existingProduct.setCategory(category);
-        }
-
-        // Chỉ cập nhật các trường không null từ DTO
-        if (productDTO.title() != null) {
-            existingProduct.setTitle(productDTO.title());
-        }
-        if (productDTO.price() != null) {
-            existingProduct.setPrice(productDTO.price());
-        }
-        if (productDTO.category() != null) {
-            existingProduct.setCategory(productDTO.category());
-        }
-        if (productDTO.ratingRate() != null) {
-            existingProduct.setRatingRate(productDTO.ratingRate());
-        }
-        if (productDTO.ratingCount() != null) {
-            existingProduct.setRatingCount(productDTO.ratingCount());
-        }
-
-        Product updatedProduct = productService.updateProduct(existingProduct);
-        return ResponseEntity.ok(updatedProduct);
+        model.addAttribute("product", updatedProduct);
+        return "product/product";
     }
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProductById(@PathVariable int id) {
+    public String deleteProductById(@PathVariable int id, Model model) {
         if (productService.getProductById(id) == null) {
-            return ResponseEntity.notFound().build();
+            return "error/404";
         }
         productService.deleteProductById(id);
-        return ResponseEntity.noContent().build();
+        model.addAttribute("message", "Product deleted successfully");
+        return "redirect:/product/products"; // Redirect to the products list page
     }
 
-    @ResponseStatus(HttpStatus.OK)
     @GetMapping("/search")
-    public ResponseEntity<List<Product>> searchProducts(
+    public String searchProducts(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) Double price,
             @RequestParam(required = false) Category category,
@@ -113,7 +78,8 @@ public class ProductController {
             @RequestParam(required = false) Double minRatingRate,
             @RequestParam(required = false) Double maxRatingRate,
             @RequestParam(required = false) Double minRatingCount,
-            @RequestParam(required = false) Double maxRatingCount) {
+            @RequestParam(required = false) Double maxRatingCount,
+            Model model) {
 
         List<Product> products;
 
@@ -137,6 +103,7 @@ public class ProductController {
             products = productService.getAllProducts();
         }
 
-        return ResponseEntity.ok(products);
+        model.addAttribute("products", products);
+        return "product/products";
     }
 }

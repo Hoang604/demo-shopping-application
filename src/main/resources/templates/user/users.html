@@ -1,30 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Users</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>User List</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            text-align: center;
+            padding: 50px;
+        }
+        .container {
+            border: 1px solid #dee2e6;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            display: inline-block;
+            width: 80%;
+            margin: auto;
+        }
+        h1 {
+            font-size: 2em;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 20px;
         }
         th, td {
             padding: 10px;
-            border: 1px solid #ddd;
-            text-align: left;
+            border: 1px solid #dee2e6;
         }
         th {
-            background-color: #f4f4f4;
+            background-color: #f1f1f1;
         }
         tr:hover {
             background-color: #f1f1f1;
-            cursor: pointer; /* Thay đổi con trỏ chuột khi di chuột qua hàng */
-        }
-        a {
-            text-decoration: none;
-            color: inherit;
         }
         .create-button {
             display: inline-block;
@@ -40,6 +51,7 @@
             background-color: #555;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         // JavaScript để làm cho toàn bộ hàng có thể nhấp được
         document.addEventListener('DOMContentLoaded', function() {
@@ -49,6 +61,19 @@
                     window.location.href = row.getAttribute('data-href');
                 });
             });
+        });
+
+        // Hiển thị popup nếu có thông báo
+        document.addEventListener('DOMContentLoaded', function() {
+            var message = /*[[${message}]]*/ 'null';
+            if (message !== 'null') {
+                Swal.fire({
+                    title: 'Success',
+                    text: message,
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+            }
         });
     </script>
 </head>
@@ -69,19 +94,15 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Sử dụng Thymeleaf để lặp qua danh sách người dùng và hiển thị chúng -->
-                <tr th:each="user : ${users}" th:attr="data-href=@{/api/users/{id}(id=${user.id})}">
+                <tr th:each="user : ${users}" data-href="@{/users/{id}(id=${user.id})}">
                     <td th:text="${user.id}">1</td>
-                    <td th:text="${user.username}">Username</td>
-                    <td th:text="${user.password}">Password</td>
-                    <td th:text="${user.phoneNumber}">Phone number</td>
-                    <td th:text="${user.role}">Role</td>
+                    <td th:text="${user.username}">username</td>
+                    <td th:text="${user.password}">password</td>
+                    <td th:text="${user.phoneNumber}">phone number</td>
+                    <td th:text="${user.role}">role</td>
                 </tr>
             </tbody>
         </table>
     </main>
-    <footer>
-        <p>&copy; 2023 Demo Shopping Application</p>
-    </footer>
 </body>
 </html>

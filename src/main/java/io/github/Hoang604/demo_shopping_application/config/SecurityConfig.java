@@ -32,20 +32,21 @@ public class SecurityConfig {
                 .csrf(customizer->customizer.disable())
                 .authorizeHttpRequests(request -> request
                     .requestMatchers("/","/login", "/logout", "/register", "/home", "/images/logo/**").permitAll()
-                    .anyRequest().authenticated())
-                .formLogin(formLogin -> formLogin
-                    .loginPage("/login")
-                    .defaultSuccessUrl("/home")
-                    .failureUrl("/login?error=true")
-                    .permitAll()
-                )
-                .oauth2Login(oauth2 -> oauth2
-                    .loginPage("/login")
-                    .failureUrl("/login?error=true")
-                    .userInfoEndpoint(userInfo -> userInfo
-                    .oidcUserService(oidcUserService()))
-                    .permitAll()    
-                )
+                    .anyRequest().permitAll())
+                    // .anyRequest().authenticated())
+                // .formLogin(formLogin -> formLogin
+                //     .loginPage("/login")
+                //     .defaultSuccessUrl("/home")
+                //     .failureUrl("/login?error=true")
+                //     .permitAll()
+                // )
+                // .oauth2Login(oauth2 -> oauth2
+                //     .loginPage("/login")
+                //     .failureUrl("/login?error=true")
+                //     .userInfoEndpoint(userInfo -> userInfo
+                //     .oidcUserService(oidcUserService()))
+                //     .permitAll()    
+                // )
                 .httpBasic(Customizer.withDefaults())
                 // .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .logout(logout -> logout
@@ -69,7 +70,7 @@ public class SecurityConfig {
 
         return provider;
     }
-        @Bean
+    @Bean
     public OidcUserService oidcUserService() {
         return new OidcUserService();
     }

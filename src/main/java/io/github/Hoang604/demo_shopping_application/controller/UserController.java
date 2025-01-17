@@ -2,19 +2,17 @@ package io.github.Hoang604.demo_shopping_application.controller;
 
 import io.github.Hoang604.demo_shopping_application.model.User;
 import io.github.Hoang604.demo_shopping_application.service.UserService;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import org.springframework.ui.Model;
+import io.github.Hoang604.demo_shopping_application.dto.CreateUserDTO;
 import io.github.Hoang604.demo_shopping_application.dto.UpdateUserDTO;
+
+import org.springframework.web.bind.annotation.*;
+import org.springframework.ui.Model;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
 
 @Controller
-@RequestMapping("/api/users")
+@RequestMapping("/users")
 public class UserController {
 
     private final UserService userService;
@@ -23,27 +21,32 @@ public class UserController {
         this.userService = userService;
     }
 
-    @ResponseStatus(HttpStatus.OK)
     @GetMapping
     public String getAllUsers(Model model) {
         List<User> users = userService.getAllUsers();
+        // Add users to model (it contain attributes that I want to render in view)
         model.addAttribute("users", users);
-        return "users";
+        return "user/users";
     }
 
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<Void> createUser(@RequestBody User user) {
-        userService.createUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public String createUser(@RequestBody CreateUserDTO userDTO, Model model) {
+        if (userService.exist(userDTO.username())) {
+            model.addAttribute("error", "The user with username " + userDTO.username() + " already exists. Please choose another username.");
+            return "error/user-already-exists";
+        }
+        User newUser = userService.createUser(userDTO);
+        model.addAttribute("message", "User created successfully");
+        return "redirect:user/user/" + newUser.getId();
     }
 
     @GetMapping("/new")
     public String showCreateUserForm(Model model) {
+        // add model attribute to bind form data
         model.addAttribute("user", new User());
-        return "create-user";
+        return "user/create-user";
     }
 
-    @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{id}")
     public String getUserById(@PathVariable int id, Model model) {
         User user = userService.getUserById(id);
@@ -51,44 +54,26 @@ public class UserController {
             return "error/404";
         }
         model.addAttribute("user", user);
-        return "user";
+        return "user/user";
     }
 
-    @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateUser(@PathVariable int id, @RequestBody UpdateUserDTO userDTO) {
-        User existingUser = userService.getUserById(id);
-        if (existingUser == null) {
-            return ResponseEntity.notFound().build();
+    public String updateUser(@PathVariable int id, @RequestBody UpdateUserDTO userDTO, Model model) {
+        User newUser = userService.updateUser(userDTO, id);
+        if (newUser == null) {
+            return "error/404";
         }
-
-        userDTO.print();
-    
-        // Chỉ cập nhật các trường không null từ DTO
-        if (userDTO.username() != null) {
-            existingUser.setUsername(userDTO.username());
-        }
-        if (userDTO.password() != null) {
-            existingUser.setPassword(userDTO.password());
-        }
-        if (userDTO.phoneNumber() != null) {
-            existingUser.setPhoneNumber(userDTO.phoneNumber());
-        }
-        if (userDTO.role() != null) {
-            existingUser.setRole(userDTO.role());
-        }
-    
-        userService.updateUser(existingUser);
-        return ResponseEntity.noContent().build();
+        model.addAttribute("message", "User updated successfully");
+        return "redirect:user/user/" + id;
     }
     
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUserById(@PathVariable int id) {
+        @PostMapping("/delete/{id}")
+    public String deleteUserById(@PathVariable int id, Model model) {
         if (userService.getUserById(id) == null) {
-            return ResponseEntity.notFound().build();
+            return "error/404";
         }
         userService.deleteUserById(id);
-        return ResponseEntity.noContent().build();
+        model.addAttribute("message", "User deleted successfully");
+        return "redirect:user/users"; // Redirect to the users list page
     }
 }

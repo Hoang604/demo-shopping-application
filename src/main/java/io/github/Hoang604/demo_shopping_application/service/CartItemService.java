@@ -1,11 +1,10 @@
 package io.github.Hoang604.demo_shopping_application.service;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
 import io.github.Hoang604.demo_shopping_application.model.CartItem;
 import io.github.Hoang604.demo_shopping_application.repository.CartItemRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class CartItemService {
@@ -14,6 +13,9 @@ public class CartItemService {
 
     public CartItemService(CartItemRepository cartItemRepository) {
         this.cartItemRepository = cartItemRepository;
+    }
+    public List<CartItem> getAllCartItems() {
+        return cartItemRepository.findAll();
     }
 
     public CartItem newCartItem(CartItem item) {
@@ -34,9 +36,5 @@ public class CartItemService {
 
     public void deleteAllCartItems() {
         cartItemRepository.deleteAll();
-    }
-
-    public List<CartItem> getAllCartItems() {
-        return cartItemRepository.findAll();
     }
 }

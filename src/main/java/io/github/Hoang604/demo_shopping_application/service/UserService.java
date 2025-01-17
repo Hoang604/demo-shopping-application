@@ -1,5 +1,7 @@
 package io.github.Hoang604.demo_shopping_application.service;
 
+import io.github.Hoang604.demo_shopping_application.dto.CreateUserDTO;
+import io.github.Hoang604.demo_shopping_application.dto.UpdateUserDTO;
 import io.github.Hoang604.demo_shopping_application.model.User;
 import io.github.Hoang604.demo_shopping_application.repository.UserRepository;
 
@@ -17,9 +19,25 @@ public class UserService{
         this.userRepository = userRepository;
     }
 
-    public User createUser(User user) {
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    public User getUserByPhoneNumber(String phoneNumber) {
+        return userRepository.findByPhoneNumber(phoneNumber);
+    }
+
+    public boolean exist(String username) {
+        return userRepository.findByUsername(username) != null;
+    }
+
+    public User createUser(CreateUserDTO userDTO) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
-        user.setPassword(encoder.encode(user.getPassword()));
+        User user = new User(
+                userDTO.username(),
+                encoder.encode(userDTO.password()),
+                userDTO.role(),
+                userDTO.phoneNumber());
         return userRepository.save(user);
     }
 
@@ -27,7 +45,16 @@ public class UserService{
         return userRepository.findById(id).orElse(null);
     }
 
-    public User updateUser(User user) {
+    public User updateUser(UpdateUserDTO userDTO, int userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return null;
+        }
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+        user.setPassword(encoder.encode(userDTO.password()));
+        user.setRole(userDTO.role());
+        user.setPhoneNumber(userDTO.phoneNumber());
+
         return userRepository.save(user);
     }
 

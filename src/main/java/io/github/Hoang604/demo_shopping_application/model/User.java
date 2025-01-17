@@ -119,31 +119,4 @@ public class User {
         }
         this.role = role;
     }
-
-    public void printUser() {
-        System.out.println("User ID: " + this.id);
-        System.out.println("Username: " + this.username);
-        System.out.println("Password: " + this.password);
-        System.out.println("Phone Number: " + this.phoneNumber);
-        System.out.println("Role: " + this.role);
-    }
-
-    public void printOnlyUser() {
-        System.out.println(
-                this.id + " " + this.username + " " + this.password + " " + this.phoneNumber + " " + this.role);
-    }
-    
-    public int compareTo(User other) {
-        int result = this.username.compareTo(other.username);
-        if (result == 0) {
-            result = this.password.compareTo(other.password);
-            if (result == 0) {
-                result = this.phoneNumber.compareTo(other.phoneNumber);
-                if (result == 0) {
-                    result = this.role.compareTo(other.role);
-                }
-            }
-        }
-        return result;
-    }
 }

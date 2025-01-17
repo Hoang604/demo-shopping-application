@@ -12,15 +12,17 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "cart_items")
 public class CartItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private int id;
     @ManyToOne
-    @JoinColumn(name="cart_id",referencedColumnName="id")
-    private Cart cart;
+    @JoinColumn(name="user_id",referencedColumnName="id")
+    private User user;
     @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     private Product product;
@@ -28,17 +30,17 @@ public class CartItem {
     private int quantity;
 
     public CartItem() {
-        this.cart = null;
+        this.user = null;
         this.product = null;
         this.quantity = 0;
     }
 
-    public CartItem(Cart cart, Product product, int quantity) {
+    public CartItem(User user, Product product, int quantity) {
         if (quantity < 0) {
             throw new IllegalArgumentException("quantity cannot be negative");
         }
 
-        this.cart = cart;
+        this.user = user;
         this.product = product;
         this.quantity = quantity;
     }
@@ -51,12 +53,12 @@ public class CartItem {
         this.id = id;
     }
 
-    public Cart getCart() {
-        return cart;
+    public User getUser() {
+        return user;
     }
 
-    public void setCart(Cart cart) {
-        this.cart = cart;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Product getProduct() {
@@ -81,5 +83,4 @@ public class CartItem {
     public double getTotalPrice() {
         return this.quantity * this.product.getPrice();
     }
-    
 }

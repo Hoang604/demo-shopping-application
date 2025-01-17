@@ -17,118 +17,94 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private int id;
+
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
+
     @CreationTimestamp
-    @Column(nullable = true, name = "order_date")
+    @Column(name = "order_date")
     private java.sql.Timestamp orderDate;
-    @Column(name = "total_amount")
-    private double totalAmount;
-    @Column(nullable = true, name = "status")
+
+    @Column(name = "status")
     private String status;
 
-    public Order() {
+    @ManyToOne
+    @JoinColumn(name = "product_id", referencedColumnName = "id")
+    private Product product;
+
+    @Column(name = "quantity")
+    private int quantity;
+
+
+
+    public Order(){
         this.user = null;
         this.orderDate = new java.sql.Timestamp(System.currentTimeMillis());
-        this.totalAmount = 0;
         this.status = "";
+        this.product = null;
+        this.quantity = 0;
     }
 
-    public Order(User user, double totalAmount, String status) {
-        if (totalAmount < 0) {
-            throw new IllegalArgumentException("totalAmount cannot be negative");
+    public Order(User user, java.sql.Timestamp orderDate, String status, Product product, int quantity) {
+        if (quantity < 0) {
+            throw new IllegalArgumentException("quantity cannot be negative");
         }
         this.user = user;
-        this.orderDate = new java.sql.Timestamp(System.currentTimeMillis());
-        this.totalAmount = totalAmount;
+        this.orderDate = orderDate;
         this.status = status;
+        this.product = product;
+        this.quantity = quantity;
     }
 
     public int getId() {
-        return this.id;
-    }
-
-    public User getUser() {
-        return this.user;
-    }
-    
-    public java.sql.Timestamp getOrderDate() {
-        return this.orderDate;
-    }
-
-    public double getTotalAmount() {
-        return this.totalAmount;
-    }
-
-    public String getStatus() {
-        return this.status;
+        return id;
     }
 
     public void setId(int id) {
         this.id = id;
     }
 
+    public User getUser() {
+        return user;
+    }
+
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public java.sql.Timestamp getOrderDate() {
+        return orderDate;
     }
 
     public void setOrderDate(java.sql.Timestamp orderDate) {
         this.orderDate = orderDate;
     }
 
-    public void setTotalAmount(double totalAmount) {
-        if (totalAmount < 0) {
-            throw new IllegalArgumentException("totalAmount cannot be negative");
-        }
-        this.totalAmount = totalAmount;
+    public String getStatus() {
+        return status;
     }
 
     public void setStatus(String status) {
         this.status = status;
     }
 
-    @Override
-    public String toString() {
-        return this.id + " " + this.user.getId() + " " + this.orderDate + " " + this.totalAmount + " " + this.status;
+    public Product getProduct() {
+        return product;
     }
 
-    public void printOrder() {
-        System.out.println("Order ID: " + this.id);
-        System.out.println("User ID: " + this.user.getId());
-        System.out.println("Order Date: " + this.orderDate);
-        System.out.println("Status: " + this.status);
+    public void setProduct(Product product) {
+        this.product = product;
     }
 
-    public void printOnlyOrder() {
-        System.out.println(this.id + " " + this.user.getId() + " " + this.orderDate + " " + this.status);
+    public int getQuantity() {
+        return quantity;
     }
 
-    public int compareTo(Order other) {
-        int result = this.id - other.id;
-        if (result == 0) {
-            result = this.user.getId() - other.user.getId();
-            if (result == 0) {
-                result = this.orderDate.compareTo(other.orderDate);
-                if (result == 0) {
-                    result = this.status.compareTo(other.status);
-                }
-            }
+    public void setQuantity(int quantity) {
+        if (quantity < 0) {
+            throw new IllegalArgumentException("quantity cannot be negative");
         }
-        return result;
+        this.quantity = quantity;
     }
-
-    // sort orders by id, userId, orderDate, status
-    public static void sort(Order[] orders) {
-        for (int i = 0; i < orders.length - 1; i++) {
-            for (int j = i + 1; j < orders.length; j++) {
-                if (orders[i].compareTo(orders[j]) > 0) {
-                    Order temp = orders[i];
-                    orders[i] = orders[j];
-                    orders[j] = temp;
-                }
-            }
-        }
-    }
-    
 }

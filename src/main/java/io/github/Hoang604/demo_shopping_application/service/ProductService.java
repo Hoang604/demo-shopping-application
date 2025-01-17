@@ -1,5 +1,6 @@
 package io.github.Hoang604.demo_shopping_application.service;
 
+import io.github.Hoang604.demo_shopping_application.dto.UpdateProductDTO;
 import io.github.Hoang604.demo_shopping_application.model.Category;
 import io.github.Hoang604.demo_shopping_application.model.Product;
 import io.github.Hoang604.demo_shopping_application.repository.ProductRepository;
@@ -11,9 +12,11 @@ import java.util.List;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final CategoryService categoryService;
 
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository, CategoryService categoryService) {
         this.productRepository = productRepository;
+        this.categoryService = categoryService;
     }
 
     public Product createProduct(Product product) {
@@ -24,8 +27,26 @@ public class ProductService {
         return productRepository.findById(id).orElse(null);
     }
 
-    public Product updateProduct(Product product) {
-        return productRepository.save(product);
+    public Product updateProduct(int id, UpdateProductDTO productDTO) {
+        Product existingProduct = getProductById(id);
+        if (existingProduct == null) {
+            return null;
+        }
+
+        if (productDTO.category() != null) {
+            Category category = categoryService.getCategoryById(productDTO.category().getId());
+            if (category == null) {
+                category = categoryService.createCategory(productDTO.category());
+            }
+            existingProduct.setCategory(category);
+        }
+
+        existingProduct.setTitle(productDTO.title());
+        existingProduct.setPrice(productDTO.price());
+        existingProduct.setRatingRate(productDTO.ratingRate());
+        existingProduct.setRatingCount(productDTO.ratingCount());
+
+        return productRepository.save(existingProduct);
     }
 
     public void deleteProductById(int id) {

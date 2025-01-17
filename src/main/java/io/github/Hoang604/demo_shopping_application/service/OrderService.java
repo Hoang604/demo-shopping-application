@@ -5,23 +5,19 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import io.github.Hoang604.demo_shopping_application.model.Order;
-import io.github.Hoang604.demo_shopping_application.model.OrderItem;
 import io.github.Hoang604.demo_shopping_application.repository.OrderRepository;
-import io.github.Hoang604.demo_shopping_application.repository.OrderItemRepository;
 
 
 @Service
 public class OrderService {
     private final OrderRepository orderRepository;
-    private final OrderItemRepository orderItemRepository; 
 
-    public OrderService(OrderRepository orderRepository, OrderItemRepository orderItemService) {
+    public OrderService(OrderRepository orderRepository) {
         this.orderRepository = orderRepository;
-        this.orderItemRepository = orderItemService;
     }
 
-    public void saveOrder(OrderItem order) {
-        orderItemRepository.save(order);
+    public void saveOrder(Order order) {
+        orderRepository.save(order);
     }
 
     public void saveAllOrder(List<Order> orders) {
