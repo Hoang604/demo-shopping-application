@@ -1,11 +1,46 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Products</title>
     <link rel="stylesheet" href="styles.css">
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            text-align: center;
+            padding: 50px;
+        }
+        .container {
+            border: 1px solid #dee2e6;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            display: inline-block;
+            width: 80%;
+            margin: auto;
+        }
+        h1 {
+            font-size: 2em;
+        }
+        .dropdown {
+            margin-bottom: 20px;
+        }
+        .create-button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-bottom: 20px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        .create-button:hover {
+            background-color: #555;
+        }
         .product-item {
             display: flex;
             align-items: center;
@@ -14,6 +49,10 @@
             margin-bottom: 10px;
             text-decoration: none;
             color: inherit;
+            transition: background-color 0.3s;
+        }
+        .product-item:hover {
+            background-color: #f1f1f1;
         }
         .product-item img {
             max-width: 100px;
@@ -22,6 +61,7 @@
         .product-details {
             display: flex;
             flex-direction: column;
+            align-items: flex-start;
         }
         .product-details h2 {
             margin: 0;
@@ -30,30 +70,80 @@
         .product-details p {
             margin: 5px 0;
         }
+        .product-actions {
+            margin-left: auto;
+        }
+        .product-actions form {
+            display: inline;
+        }
+        .product-actions button {
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .product-actions button:hover {
+            background-color: #c82333;
+        }
     </style>
 </head>
 <body>
     <header>
-        <h1>Product List</h1>
+        <h1>Products List</h1>
+        <div th:if="${category != null}">
+            <h2 th:text="${category.name}">Category Name</h2>
+        </div>
+        <div th:if="${message != null}">
+            <p th:text="${message}"></p>
+        </div>
     </header>
     <main>
-        <section id="products">
-            <ul>
-                <!-- Sử dụng Thymeleaf để lặp qua danh sách sản phẩm và hiển thị chúng -->
-                <li th:each="product : ${products}">
-                    <a th:href="@{/api/products/{id}(id=${product.id})}" class="product-item">
+        <div class="container">
+            <div class="dropdown">
+                <label for="categorySelect">Select Category:</label>
+                <select id="categorySelect" onchange="filterByCategory()">
+                    <option value="">All Categories</option>
+                    <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
+                </select>
+            </div>
+            <a href="/products/new" class="create-button">Create New Product</a>
+            <section id="products">
+                <ul>
+                    <!-- Sử dụng Thymeleaf để lặp qua danh sách sản phẩm và hiển thị chúng -->
+                    <li th:each="product : ${products}" class="product-item">
                         <img th:src="${product.image}" alt="Product Image">
                         <div class="product-details">
                             <h2 th:text="${product.title}">Product Title</h2>
                             <p>Price: <span th:text="${product.price}">0.00</span></p>
                         </div>
-                    </a>
-                </li>
-            </ul>
-        </section>
+                        <div class="product-actions">
+                            <form th:action="@{/products/delete/{id}(id=${product.id})}" method="post">
+                                <button type="submit">Delete</button>
+                            </form>
+                        </div>
+                    </li>
+                </ul>
+                <div th:if="${#lists.isEmpty(products)}">
+                    <p>No products available in this category.</p>
+                </div>
+            </section>
+        </div>
     </main>
     <footer>
         <p>&copy; 2023 Shopping Application</p>
     </footer>
+    <script>
+        function filterByCategory() {
+            var categoryId = document.getElementById("categorySelect").value;
+            var url = "/products";
+            if (categoryId) {
+                url += "?categoryId=" + categoryId;
+            }
+            window.location.href = url;
+        }
+    </script>
 </body>
 </html>

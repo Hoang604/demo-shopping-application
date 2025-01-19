@@ -12,7 +12,7 @@ import org.springframework.stereotype.Controller;
 import java.util.List;
 
 @Controller
-@RequestMapping("/users")
+@RequestMapping("/users/")
 public class UserController {
 
     private final UserService userService;
@@ -40,14 +40,14 @@ public class UserController {
         return "redirect:user/user/" + newUser.getId();
     }
 
-    @GetMapping("/new")
+    @GetMapping("new")
     public String showCreateUserForm(Model model) {
         // add model attribute to bind form data
         model.addAttribute("user", new User());
         return "user/create-user";
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("{id}")
     public String getUserById(@PathVariable int id, Model model) {
         User user = userService.getUserById(id);
         if (user == null) {
@@ -57,7 +57,7 @@ public class UserController {
         return "user/user";
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("{id}")
     public String updateUser(@PathVariable int id, @RequestBody UpdateUserDTO userDTO, Model model) {
         User newUser = userService.updateUser(userDTO, id);
         if (newUser == null) {
@@ -67,7 +67,7 @@ public class UserController {
         return "redirect:user/user/" + id;
     }
     
-        @PostMapping("/delete/{id}")
+    @PostMapping("delete/{id}")
     public String deleteUserById(@PathVariable int id, Model model) {
         if (userService.getUserById(id) == null) {
             return "error/404";

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            text-align: center;
+            padding: 50px;
+        }
+        .container {
+            border: 1px solid #dee2e6;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            display: inline-block;
+            width: 80%;
+            margin: auto;
+        }
+        h1 {
+            font-size: 2em;
+        }
+        .order-details {
+            text-align: left;
+            margin-top: 20px;
+        }
+        .order-details label {
+            font-weight: bold;
+        }
+        .order-details div {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Order Details</h1>
+        <div class="order-details">
+            <div>
+                <label>Order Date:</label>
+                <span th:text="${order.orderDate}">2023-01-01 12:00:00</span>
+            </div>
+            <div>
+                <label>Status:</label>
+                <span th:text="${order.status}">Pending</span>
+            </div>
+            <div>
+                <label>Product:</label>
+                <span th:text="${order.product.title}">Product Title</span>
+            </div>
+            <div>
+                <label>Price:</label>
+                <span th:text="${order.product.price}">100.00</span>
+            </div>
+            <div>
+                <label>Quantity:</label>
+                <span th:text="${order.quantity}">1</span>
+            </div>
+            <div>
+                <label>Total:</label>
+                <span th:text="${order.product.price * order.quantity}">100.00</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

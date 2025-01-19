@@ -1,5 +1,6 @@
 package io.github.Hoang604.demo_shopping_application.controller;
 
+import io.github.Hoang604.demo_shopping_application.service.CategoryService;
 import io.github.Hoang604.demo_shopping_application.dto.UpdateProductDTO;
 import io.github.Hoang604.demo_shopping_application.model.Category;
 import io.github.Hoang604.demo_shopping_application.model.Product;
@@ -12,31 +13,36 @@ import org.springframework.ui.Model;
 import java.util.List;
 
 @Controller
-@RequestMapping("/products")
+@RequestMapping("/products/")
 public class ProductController {
 
     private final ProductService productService;
+    private final CategoryService categoryService;
     
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, CategoryService categoryService) {
         this.productService = productService;
+        this.categoryService = categoryService;
     }
 
     @GetMapping
-    public String getAllProducts(Model model) {
-        List<Product> products = productService.getAllProducts();
-        // Thêm danh sách sản phẩm vào model (model chứa các thuộc tính mà bạn muốn render trong view)
+    public String getAllProducts(@RequestParam(required = false) Integer categoryId, Model model) {
+        List<Product> products =  productService.getAllProducts();
+        List<Category> categories = categoryService.getAllCategories();
         model.addAttribute("products", products);
+        model.addAttribute("categories", categories);
         return "product/products";
     }
 
-    @PostMapping
+
+    @PostMapping(consumes = "application/json")
     public String createProduct(@RequestBody Product product, Model model) {
         Product newProduct = productService.createProduct(product);
         model.addAttribute("product", newProduct);
+        model.addAttribute("message", "Product created successfully");
         return "product/product";
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("{id}")
     public String getProductById(@PathVariable int id, Model model) {
         Product product = productService.getProductById(id);
         if (product == null) {
@@ -46,17 +52,18 @@ public class ProductController {
         return "product/product";
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("{id}")
     public String updateProduct(@PathVariable int id, @RequestBody UpdateProductDTO productDTO, Model model) {
         Product updatedProduct = productService.updateProduct(id, productDTO);
         if (updatedProduct == null) {
             return "error/product-not-exist";
         }
         model.addAttribute("product", updatedProduct);
+        model.addAttribute("message", "Product updated successfully");
         return "product/product";
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{id}")
     public String deleteProductById(@PathVariable int id, Model model) {
         if (productService.getProductById(id) == null) {
             return "error/404";
@@ -66,7 +73,7 @@ public class ProductController {
         return "redirect:/product/products"; // Redirect to the products list page
     }
 
-    @GetMapping("/search")
+    @GetMapping("search/")
     public String searchProducts(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) Double price,

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart Item Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            text-align: center;
+            padding: 50px;
+        }
+        .container {
+            border: 1px solid #dee2e6;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            display: inline-block;
+            width: 80%;
+            margin: auto;
+        }
+        h1 {
+            font-size: 2em;
+        }
+        .cart-item {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            text-decoration: none;
+            color: inherit;
+            transition: background-color 0.3s;
+        }
+        .cart-item:hover {
+            background-color: #f1f1f1;
+        }
+        .cart-item img {
+            max-width: 100px;
+            margin-right: 20px;
+        }
+        .cart-details {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .cart-details h2 {
+            margin: 0;
+            font-size: 1.2em;
+        }
+        .cart-details p {
+            margin: 5px 0;
+        }
+        .cart-quantity {
+            margin-left: auto;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cart Item Details</h1>
+        <div class="cart-item">
+            <img th:src="${cartItem.product.image}" alt="Product Image">
+            <div class="cart-details">
+                <h2 th:text="${cartItem.product.title}">Product Title</h2>
+                <p th:text="${cartItem.product.description}">Product Description</p>
+                <p>Price: <span th:text="${cartItem.product.price}">0.00</span></p>
+                <p>Category: <span th:text="${cartItem.product.category.name}">Category Name</span></p>
+            </div>
+            <div class="cart-quantity">
+                <p>Quantity: <span th:text="${cartItem.quantity}">1</span></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

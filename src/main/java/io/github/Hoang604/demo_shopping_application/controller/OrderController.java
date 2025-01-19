@@ -3,12 +3,12 @@ package io.github.Hoang604.demo_shopping_application.controller;
 import io.github.Hoang604.demo_shopping_application.service.OrderService;
 import io.github.Hoang604.demo_shopping_application.model.Order;
 import java.util.List;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.ui.Model;
+import org.springframework.stereotype.Controller;
 
-@RestController
-@RequestMapping("/order")
+@Controller
+@RequestMapping("/users/{userId}/orders")
 public class OrderController {
     private final OrderService orderService;
 
@@ -17,38 +17,33 @@ public class OrderController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Order>> getAllOrders() {
+    public String getAllOrders(Model model) {
         List<Order> orders = orderService.getAllOrders();
-        return new ResponseEntity<>(orders, HttpStatus.OK);
+        model.addAttribute("orders", orders);
+        return "order/orders";
     }
 
-    // @PostMapping
-    // public ResponseEntity<Void> saveOrder(@RequestBody Order order) {
-    //     orderService.saveOrder(order);
-    //     return new ResponseEntity<>(HttpStatus.CREATED);
-    // }
-
-    @PostMapping("/all")
-    public ResponseEntity<Void> saveAllOrder(@RequestBody List<Order> orders) {
-        orderService.saveAllOrder(orders);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    @PostMapping
+    public String saveOrder(@RequestBody Order order, Model model) {
+        orderService.saveOrder(order);
+        model.addAttribute("order", order);
+        model.addAttribute("message", "Order created successfully");
+        return "order/order-confirmation";
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Order> getOrderById(@PathVariable int id) {
+    public String getOrderById(@PathVariable int id, Model model) {
         Order order = orderService.getOrderById(id);
-        return new ResponseEntity<>(order, HttpStatus.OK);
+        if (order == null) {
+            return "error/404";
+        }
+        model.addAttribute("order", order);
+        return "order/order";
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteOrderById(@PathVariable int id) {
+    public String deleteOrderById(@PathVariable int id) {
         orderService.deleteOrderById(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
-    @DeleteMapping
-    public ResponseEntity<Void> deleteAllOrders() {
-        orderService.deleteAllOrders();
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return "redirect:/users/{userId}/orders";
     }
 }

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart Item Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            text-align: center;
+            padding: 50px;
+        }
+        .container {
+            border: 1px solid #dee2e6;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            display: inline-block;
+            width: 80%;
+            margin: auto;
+        }
+        h1 {
+            font-size: 2em;
+        }
+        .message {
+            margin-bottom: 20px;
+        }
+        .buttons {
+            margin-top: 20px;
+        }
+        .buttons a {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        .buttons a:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cart Item Confirmation</h1>
+        <p class="message" th:text="${message}">Cart item created successfully</p>
+        <div class="buttons">
+            <a href="/" class="home-button">Go to Home</a>
+            <a th:href="@{/cart}" class="cart-button">View Cart</a>
+        </div>
+    </div>
+</body>
+</html>
