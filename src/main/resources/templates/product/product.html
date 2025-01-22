@@ -72,6 +72,20 @@
             bottom: 0;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var message = /*[[${message}]]*/ 'null';
+            if (message !== 'null') {
+                Swal.fire({
+                    title: 'Success',
+                    text: message,
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+    </script>
 </head>
 <body>
     <header>
@@ -85,6 +99,7 @@
                 <p th:text="${product.description}">Product Description</p>
                 <p class="price">Price: $<span th:text="${product.price}">0.00</span></p>
                 <p class="rating">Rating: <span th:text="${product.ratingRate}">0.0</span> (<span th:text="${product.ratingCount}">0</span> Rates)</p>
+                <p>Category: <span th:text="${product.category.name}">Category Name</span></p>
             </div>
         </div>
     </main>

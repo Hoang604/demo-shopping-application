@@ -2,6 +2,7 @@ package io.github.Hoang604.demo_shopping_application.controller;
 
 import io.github.Hoang604.demo_shopping_application.service.CategoryService;
 import io.github.Hoang604.demo_shopping_application.dto.UpdateProductDTO;
+import io.github.Hoang604.demo_shopping_application.dto.createProductDTO;
 import io.github.Hoang604.demo_shopping_application.model.Category;
 import io.github.Hoang604.demo_shopping_application.model.Product;
 import io.github.Hoang604.demo_shopping_application.service.ProductService;
@@ -10,10 +11,11 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.ui.Model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-@RequestMapping("/products/")
+@RequestMapping("/products")
 public class ProductController {
 
     private final ProductService productService;
@@ -24,25 +26,48 @@ public class ProductController {
         this.categoryService = categoryService;
     }
 
-    @GetMapping
+
+    @GetMapping("/")
     public String getAllProducts(@RequestParam(required = false) Integer categoryId, Model model) {
-        List<Product> products =  productService.getAllProducts();
+        System.out.println("categoryId: " + categoryId);
+        if (categoryId != null) {
+            System.out.println("categoryId: " + categoryId);
+            Category category = categoryService.getCategoryById(categoryId);
+            model.addAttribute("category", category);
+            if (category == null) {
+                return "error/404";
+            }
+            List<Product> products = productService.findByCategory(category);
+            model.addAttribute("products", products);
+        } else {
+            List<Product> products = productService.getAllProducts();
+            model.addAttribute("products", products);
+        }
         List<Category> categories = categoryService.getAllCategories();
-        model.addAttribute("products", products);
         model.addAttribute("categories", categories);
         return "product/products";
     }
 
 
-    @PostMapping(consumes = "application/json")
-    public String createProduct(@RequestBody Product product, Model model) {
-        Product newProduct = productService.createProduct(product);
+    @PostMapping(value = "/", consumes = "application/json")
+    public String createProduct(@RequestBody createProductDTO product, Model model) {
+        Product newProduct = new Product();
+        newProduct.setTitle(product.title());
+        newProduct.setPrice(product.price());
+        newProduct.setDescription(product.description());
+        Category category = categoryService.getCategoryById(product.categoryId());
+        newProduct.setCategory(category);
+        newProduct.setRatingRate(0.0);
+        newProduct.setRatingCount(0);
+        newProduct.setImage(product.image());
+        System.out.println("newProduct: " + newProduct);
+        productService.createProduct(newProduct);
         model.addAttribute("product", newProduct);
         model.addAttribute("message", "Product created successfully");
         return "product/product";
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public String getProductById(@PathVariable int id, Model model) {
         Product product = productService.getProductById(id);
         if (product == null) {
@@ -52,7 +77,7 @@ public class ProductController {
         return "product/product";
     }
 
-    @PutMapping("{id}")
+    @PutMapping("/{id}")
     public String updateProduct(@PathVariable int id, @RequestBody UpdateProductDTO productDTO, Model model) {
         Product updatedProduct = productService.updateProduct(id, productDTO);
         if (updatedProduct == null) {
@@ -63,7 +88,7 @@ public class ProductController {
         return "product/product";
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/delete/{id}")
     public String deleteProductById(@PathVariable int id, Model model) {
         if (productService.getProductById(id) == null) {
             return "error/404";
@@ -73,7 +98,20 @@ public class ProductController {
         return "redirect:/product/products"; // Redirect to the products list page
     }
 
-    @GetMapping("search/")
+    @GetMapping("/new")
+    public String showCreateProductForm(Model model) {
+        List<Category> categories = categoryService.getAllCategories();
+        model.addAttribute("categories", categories);
+        model.addAttribute("product", new Product());
+        return "product/create-product";
+    }
+
+    @GetMapping("/search")
+    public String redirectSearch() {
+        return "redirect:/products/search/";
+    }
+
+    @GetMapping("/search/")
     public String searchProducts(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) Double price,
@@ -89,26 +127,32 @@ public class ProductController {
             Model model) {
 
         List<Product> products;
+        products = new ArrayList<Product>();
 
         if (title != null) {
             products = productService.findByTitle(title);
-        } else if (price != null) {
-            products = productService.findByPrice(price);
-        } else if (category != null && minPrice != null && maxPrice != null) {
-            products = productService.findByCategoryAndPriceBetween(category, minPrice, maxPrice);
-        } else if (category != null && minRatingRate != null && maxRatingRate != null) {
-            products = productService.findByCategoryAndRatingRateBetween(category, minRatingRate, maxRatingRate);
-        } else if (category != null && minRatingCount != null && maxRatingCount != null) {
-            products = productService.findByCategoryAndRatingCountBetween(category, minRatingCount, maxRatingCount);
-        } else if (minPrice != null && maxPrice != null) {
-            products = productService.findByPriceBetween(minPrice, maxPrice);
-        } else if (minRatingRate != null && maxRatingRate != null) {
-            products = productService.findByRatingRateBetween(minRatingRate, maxRatingRate);
-        } else if (minRatingCount != null && maxRatingCount != null) {
-            products = productService.findByRatingCountBetween(minRatingCount, maxRatingCount);
-        } else {
-            products = productService.getAllProducts();
         }
+        if (price != null) {
+            products.addAll(productService.findByPrice(price));
+        }
+        if (category != null && minPrice != null && maxPrice != null) {
+            products.addAll(productService.findByCategoryAndPriceBetween(category, minPrice, maxPrice));
+        }
+        if (category != null && minRatingRate != null && maxRatingRate != null) {
+            products.addAll(productService.findByCategoryAndRatingRateBetween(category, minRatingRate, maxRatingRate));
+        }
+        if (category != null && minRatingCount != null && maxRatingCount != null) {
+            products.addAll(productService.findByCategoryAndRatingCountBetween(category, minRatingCount, maxRatingCount));
+        }
+        if (minPrice != null && maxPrice != null) {
+            products.addAll(productService.findByPriceBetween(minPrice, maxPrice));
+        }
+        if (minRatingRate != null && maxRatingRate != null) {
+            products.addAll(productService.findByRatingRateBetween(minRatingRate, maxRatingRate));
+        } 
+        if (minRatingCount != null && maxRatingCount != null) {
+            products.addAll(productService.findByRatingCountBetween(minRatingCount, maxRatingCount));
+        } 
 
         model.addAttribute("products", products);
         return "product/products";

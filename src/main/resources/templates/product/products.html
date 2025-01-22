@@ -73,9 +73,6 @@
         .product-actions {
             margin-left: auto;
         }
-        .product-actions form {
-            display: inline;
-        }
         .product-actions button {
             background-color: #dc3545;
             color: #fff;
@@ -120,9 +117,7 @@
                             <p>Price: <span th:text="${product.price}">0.00</span></p>
                         </div>
                         <div class="product-actions">
-                            <form th:action="@{/products/delete/{id}(id=${product.id})}" method="post">
-                                <button type="submit">Delete</button>
-                            </form>
+                            <button th:onclick="'deleteProduct(' + ${product.id} + ')'">Delete</button>
                         </div>
                     </li>
                 </ul>
@@ -143,6 +138,22 @@
                 url += "?categoryId=" + categoryId;
             }
             window.location.href = url;
+        }
+
+        function deleteProduct(productId) {
+            fetch(`/products/delete/${productId}`, {
+                method: 'DELETE'
+            }).then(response => {
+                if (response.ok) {
+                    alert('Product deleted successfully');
+                    window.location.href = '/products/';
+                } else {
+                    alert('Failed to delete product');
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+                alert('Failed to delete product');
+            });
         }
     </script>
 </body>
