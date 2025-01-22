@@ -71,6 +71,18 @@
             width: 100%;
             bottom: 0;
         }
+        .buy-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .buy-button:hover {
+            background-color: #218838;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
@@ -85,6 +97,46 @@
                 });
             }
         });
+
+        function submitOrderForm() {
+            var form = document.getElementById('orderForm');
+            var formData = new FormData(form);
+            var jsonData = JSON.stringify(Object.fromEntries(formData));
+
+            fetch('/orders', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: jsonData
+            }).then(response => {
+                if (response.ok) {
+                    Swal.fire({
+                        title: 'Success',
+                        text: 'Order created successfully',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.href = '/orders';
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Failed to create order',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Failed to create order',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            });
+        }
     </script>
 </head>
 <body>
@@ -100,6 +152,12 @@
                 <p class="price">Price: $<span th:text="${product.price}">0.00</span></p>
                 <p class="rating">Rating: <span th:text="${product.ratingRate}">0.0</span> (<span th:text="${product.ratingCount}">0</span> Rates)</p>
                 <p>Category: <span th:text="${product.category.name}">Category Name</span></p>
+                <form id="orderForm">
+                    <input type="hidden" name="productId" th:value="${product.id}">
+                    <label for="quantity">Quantity:</label>
+                    <input type="number" id="quantity" name="quantity" min="1" value="1" required>
+                    <button type="button" class="buy-button" onclick="submitOrderForm()">Buy Now</button>
+                </form>
             </div>
         </div>
     </main>

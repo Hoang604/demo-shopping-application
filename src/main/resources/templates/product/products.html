@@ -50,6 +50,7 @@
             text-decoration: none;
             color: inherit;
             transition: background-color 0.3s;
+            cursor: pointer; /* Thêm con trỏ chuột để chỉ ra rằng đây là một phần tử có thể nhấn */
         }
         .product-item:hover {
             background-color: #f1f1f1;
@@ -110,7 +111,7 @@
             <section id="products">
                 <ul>
                     <!-- Sử dụng Thymeleaf để lặp qua danh sách sản phẩm và hiển thị chúng -->
-                    <li th:each="product : ${products}" class="product-item">
+                    <li th:each="product : ${products}" class="product-item" th:onclick="'window.location.href=\'/products/' + ${product.id} + '\';'">
                         <img th:src="${product.image}" alt="Product Image">
                         <div class="product-details">
                             <h2 th:text="${product.title}">Product Title</h2>

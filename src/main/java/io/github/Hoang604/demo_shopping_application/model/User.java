@@ -18,7 +18,7 @@ import java.sql.Timestamp;
 public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    private int id;
+    private Integer id;
 
     @Column(nullable = false, name = "username")
     private String username;
@@ -49,11 +49,11 @@ public class User {
         this.updatedAt = new Timestamp(System.currentTimeMillis());
     }
 
-    public User(String username, String password, String phoneNumber, String role) {
+    public User(String username, String password, String role, String phoneNumber) {
         if (role == null || (!role.equals("admin") && !role.equals("user"))) {
             throw new IllegalArgumentException("role must be either 'admin' or 'user'");
         }
-        this.username = username;
+        this.username = username;   
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.role = role;
@@ -61,11 +61,11 @@ public class User {
         this.updatedAt = new Timestamp(System.currentTimeMillis());
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -114,9 +114,13 @@ public class User {
     }
 
     public void setRole(String role) {
-        if (role == null || (!role.equals("admin") && !role.equals("user"))) {
+        System.out.println("role: " + role);
+        if (role.equals("admin") || role.equals("user")) {
+            this.role = role;
+            return;
+        }
+        else {
             throw new IllegalArgumentException("role must be either 'admin' or 'user'");
         }
-        this.role = role;
     }
 }

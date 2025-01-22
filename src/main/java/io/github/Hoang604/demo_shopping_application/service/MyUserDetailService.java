@@ -24,22 +24,21 @@ public class MyUserDetailService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) {
-        User user = null;
-        if (username.matches("\\d+")) { // Biểu thức chính quy để kiểm tra số
-            user = userRepository.findByPhoneNumber(username);
+    public UserDetails loadUserByUsername(String input) throws UsernameNotFoundException {
+        // Kiểm tra input là username hay phone number
+        User user;
+        if (input.matches("\\d+")) { // Nếu input là số → phone number
+            user = userRepository.findByPhoneNumber(input);
+            if (user == null) {
+                throw new UsernameNotFoundException("Phone number not found");
+            }
+        } else { // Ngược lại → username
+            user = userRepository.findByUsername(input);
+            if (user == null) {
+                throw new UsernameNotFoundException("Username not found");
+            }
         }
 
-        else {
-            user = userRepository.findByUsername(username);
-        }
-
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found");
-        }
-
-        return new MyUserDetails(user, username);
-
+        return new MyUserDetails(user); // Không cần truyền input
     }
-    
 }

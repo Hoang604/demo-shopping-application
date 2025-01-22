@@ -10,16 +10,20 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class MyUserDetails implements UserDetails {
     
     private final User user;
-    private final String inputUsername;
 
-    public MyUserDetails(User user, String inputUsername) {
+    public MyUserDetails(User user) {
         this.user = user;
-        this.inputUsername = inputUsername;
+    }
+
+    public Integer getId() {
+        return user.getId();
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(new SimpleGrantedAuthority(user.getRole()));
+        // Thêm tiền tố ROLE_ vào role của user
+        String role = "ROLE_" + user.getRole().toUpperCase();
+        return Collections.singleton(new SimpleGrantedAuthority(role));
     }
 
     @Override
@@ -29,9 +33,6 @@ public class MyUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        if (inputUsername.matches("\\d+")) {
-            return user.getPhoneNumber();
-        }
         return user.getUsername();
     }
     

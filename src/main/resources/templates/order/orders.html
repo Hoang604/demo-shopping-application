@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+            color: #333;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        .status {
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        .status.pending {
+            background-color: #ffeb3b;
+            color: #333;
+        }
+        .status.completed {
+            background-color: #4caf50;
+            color: #fff;
+        }
+        .status.cancelled {
+            background-color: #f44336;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <h1>All Orders</h1>
+    <div th:each="order : ${orders}" class="order">
+        <div class="order-header">
+            <h2>Order ID: <span th:text="${order.id}"></span></h2>
+            <p>Customer Name: <span th:text="${order.user.username}"></span></p>
+            <p>Order Date: <span th:text="${order.orderDate}"></span></p>
+            <p>Status: <span th:class="'status ' + ${order.status.toLowerCase()}" th:text="${order.status}"></span></p>
+        </div>
+        <div class="order-details">
+            <div class="product">
+                <img th:src="@{${order.product.image}}" alt="Product Image">
+                <p>Product Name: <span th:text="${order.product.title}"></span></p>
+                <p>Price: $<span th:text="${order.product.price}"></span></p>
+                <p>Quantity: <span th:text="${order.quantity}"></span></p>
+                <p>Total: $<span th:text="${order.product.price * order.quantity}"></span></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
