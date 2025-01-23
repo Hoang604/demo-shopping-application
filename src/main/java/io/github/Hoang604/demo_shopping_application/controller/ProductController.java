@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.ui.Model;
+import org.springframework.http.HttpStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -93,7 +94,8 @@ public class ProductController {
         return "product/product";
     }
 
-    @DeleteMapping("/delete/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/{id}")
     public String deleteProductById(@PathVariable int id, Model model) {
         if (productService.getProductById(id) == null) {
             return "error/404";

@@ -253,6 +253,7 @@
                 </div>
             </div>
         </section>
+        <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
     </main>
 
     <footer>
@@ -262,13 +263,18 @@
     <script>
         function filterByCategory() {
             const categoryId = document.getElementById("categorySelect").value;
-            window.location.href = categoryId ? `/products?categoryId=${categoryId}` : '/products';
+            window.location.href = categoryId ? '/products/?categoryId=' + categoryId : '/products/';
         }
 
         function deleteProduct(productId) {
+            const csrfToken = document.querySelector('input[name="_csrf"]').value;
             if (confirm('Are you sure you want to delete this product?')) {
-                fetch(`/products/delete/${productId}`, {
-                    method: 'DELETE'
+                fetch('/products/' + productId, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken
+                    }
+
                 })
                 .then(response => {
                     if (response.ok) {
