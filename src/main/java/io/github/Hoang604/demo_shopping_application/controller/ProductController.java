@@ -2,10 +2,13 @@ package io.github.Hoang604.demo_shopping_application.controller;
 
 import io.github.Hoang604.demo_shopping_application.service.CategoryService;
 import io.github.Hoang604.demo_shopping_application.dto.UpdateProductDTO;
-import io.github.Hoang604.demo_shopping_application.dto.createProductDTO;
+import io.github.Hoang604.demo_shopping_application.dto.CreateProductDTO;
 import io.github.Hoang604.demo_shopping_application.model.Category;
+import io.github.Hoang604.demo_shopping_application.model.MyUserDetails;
 import io.github.Hoang604.demo_shopping_application.model.Product;
 import io.github.Hoang604.demo_shopping_application.service.ProductService;
+
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,7 +53,7 @@ public class ProductController {
 
 
     @PostMapping(value = "/", consumes = "application/json")
-    public String createProduct(@RequestBody createProductDTO product, Model model) {
+    public String createProduct(@RequestBody CreateProductDTO product, Model model) {
         Product newProduct = new Product();
         newProduct.setTitle(product.title());
         newProduct.setPrice(product.price());
@@ -68,12 +71,14 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public String getProductById(@PathVariable int id, Model model) {
+    public String getProductById(@PathVariable int id, Model model, Authentication authentication) {
         Product product = productService.getProductById(id);
         if (product == null) {
             return "error/404"; // Trả về trang lỗi nếu sản phẩm không tồn tại
         }
         model.addAttribute("product", product);
+        MyUserDetails userDetails = (MyUserDetails) authentication.getPrincipal();
+        model.addAttribute("userId", userDetails.getId());
         return "product/product";
     }
 

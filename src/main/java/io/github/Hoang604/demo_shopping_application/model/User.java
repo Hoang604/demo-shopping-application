@@ -44,14 +44,14 @@ public class User {
         this.username = "";
         this.password = "";
         this.phoneNumber = "";
-        this.role = "";
+        this.role = "USER";
         this.createdAt = new Timestamp(System.currentTimeMillis());
         this.updatedAt = new Timestamp(System.currentTimeMillis());
     }
 
     public User(String username, String password, String role, String phoneNumber) {
-        if (role == null || (!role.equals("admin") && !role.equals("user"))) {
-            throw new IllegalArgumentException("role must be either 'admin' or 'user'");
+        if (role == null || (!role.equals("ADMIN") && !role.equals("USER"))) {
+            throw new IllegalArgumentException("role must be either 'ADMIN' or 'USER'");
         }
         this.username = username;   
         this.password = password;
@@ -115,12 +115,12 @@ public class User {
 
     public void setRole(String role) {
         System.out.println("role: " + role);
-        if (role.equals("admin") || role.equals("user")) {
+        if (role.equals("ADMIN") || role.equals("USER")) {
             this.role = role;
             return;
         }
         else {
-            throw new IllegalArgumentException("role must be either 'admin' or 'user'");
+            throw new IllegalArgumentException("role must be either 'ADMIN' or 'USER'");
         }
     }
 }

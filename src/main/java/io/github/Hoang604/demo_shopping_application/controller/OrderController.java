@@ -1,6 +1,9 @@
 package io.github.Hoang604.demo_shopping_application.controller;
 
 import io.github.Hoang604.demo_shopping_application.service.OrderService;
+import io.github.Hoang604.demo_shopping_application.service.ProductService;
+import io.github.Hoang604.demo_shopping_application.service.UserService;
+import io.github.Hoang604.demo_shopping_application.dto.CreateOrderDTO;
 import io.github.Hoang604.demo_shopping_application.model.MyUserDetails;
 import io.github.Hoang604.demo_shopping_application.model.Order;
 import java.util.List;
@@ -13,9 +16,13 @@ import org.springframework.stereotype.Controller;
 @RequestMapping("/users/{userId}/orders")
 public class OrderController {
     private final OrderService orderService;
+    private final UserService userService;
+    private final ProductService productService;
 
-    public OrderController(OrderService orderService) {
+    public OrderController(OrderService orderService, UserService userService, ProductService productService) {
         this.orderService = orderService;
+        this.userService = userService;
+        this.productService = productService;
     }
 
     @GetMapping("/")
@@ -30,7 +37,8 @@ public class OrderController {
             orders = orderService.getAllOrders();
         }
         else {
-            int userId = Integer.parseInt(authentication.getName());
+            MyUserDetails userDetails = (MyUserDetails) authentication.getPrincipal();
+            int userId = userDetails.getId();
             orders = orderService.getOrdersByUserId(userId);
         }
         model.addAttribute("orders", orders);
@@ -38,9 +46,13 @@ public class OrderController {
     }
 
     @PostMapping("/")
-    public String saveOrder(@RequestBody Order order, Model model) {
-        orderService.saveOrder(order);
-        model.addAttribute("order", order);
+    public String saveOrder(@RequestBody CreateOrderDTO order, Model model) {
+        Order newOrder = new Order();
+        newOrder.setUser(userService.getUserById(order.userId()));
+        newOrder.setProduct(productService.getProductById(order.productId()));
+        newOrder.setQuantity(order.quantity());
+        orderService.saveOrder(newOrder);
+        model.addAttribute("order", newOrder);
         model.addAttribute("message", "Order created successfully");
         return "order/order-confirmation";
     }

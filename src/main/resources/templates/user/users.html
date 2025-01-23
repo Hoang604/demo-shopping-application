@@ -1,108 +1,205 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>User List</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --light-gray: #ecf0f1;
+            --text-color: #2c3e50;
+            --transition: all 0.3s ease;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background-color: #f8f9fa;
-            color: #333;
-            text-align: center;
-            padding: 50px;
+            color: var(--text-color);
+            margin: 0;
+            min-height: 100vh;
         }
+
         .container {
-            border: 1px solid #dee2e6;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            display: inline-block;
-            width: 80%;
-            margin: auto;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
         }
-        h1 {
-            font-size: 2em;
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem 0;
+            background: linear-gradient(135deg, var(--primary-color), #34495e);
+            color: white;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
         }
-        table {
+
+        .main-title {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .action-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 1.5rem;
+        }
+
+        .create-button {
+            background: var(--success-color);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .create-button:hover {
+            background: #219a52;
+            transform: translateY(-2px);
+        }
+
+        .user-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
-        th, td {
-            padding: 10px;
-            border: 1px solid #dee2e6;
+
+        .user-table thead {
+            background: var(--primary-color);
+            color: white;
         }
-        th {
-            background-color: #f1f1f1;
+
+        .user-table th,
+        .user-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--light-gray);
         }
-        tr:hover {
-            background-color: #f1f1f1;
+
+        .user-table tbody tr {
+            transition: var(--transition);
+            cursor: pointer;
         }
-        .create-button {
+
+        .user-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .user-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .role-badge {
             display: inline-block;
-            padding: 10px 20px;
-            margin-bottom: 20px;
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            border-radius: 5px;
-            text-decoration: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-transform: uppercase;
         }
-        .create-button:hover {
-            background-color: #555;
+
+        .role-admin {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .role-user {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .password-mask {
+            letter-spacing: 0.2rem;
+            color: #6c757d;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .user-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .main-title {
+                font-size: 2rem;
+            }
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        // JavaScript để làm cho toàn bộ hàng có thể nhấp được
-        document.addEventListener('DOMContentLoaded', function() {
-            var rows = document.querySelectorAll('tr[data-href]');
-            rows.forEach(function(row) {
-                row.addEventListener('click', function() {
-                    window.location.href = row.getAttribute('data-href');
-                });
-            });
-        });
-
-        // Hiển thị popup nếu có thông báo
-        document.addEventListener('DOMContentLoaded', function() {
-            var message = /*[[${message}]]*/ 'null';
-            if (message !== 'null') {
-                Swal.fire({
-                    title: 'Success',
-                    text: message,
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                });
-            }
-        });
-    </script>
 </head>
 <body>
     <header>
-        <h1>User List</h1>
+        <div class="container">
+            <h1 class="main-title">User Management</h1>
+        </div>
     </header>
-    <main>
-        <a href="/api/users/new" class="create-button">Create New User</a>
-        <table>
+
+    <main class="container">
+        <div class="action-bar">
+            <a href="/api/users/new" class="create-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 5v14M5 12h14"/>
+                </svg>
+                New User
+            </a>
+        </div>
+
+        <table class="user-table">
             <thead>
                 <tr>
                     <th>ID</th>
                     <th>Username</th>
                     <th>Password</th>
-                    <th>Phone Number</th>
+                    <th>Phone</th>
                     <th>Role</th>
                 </tr>
             </thead>
             <tbody>
-                <tr th:each="user : ${users}" data-href="@{/users/{id}(id=${user.id})}">
-                    <td th:text="${user.id}">1</td>
-                    <td th:text="${user.username}">username</td>
-                    <td th:text="${user.password}">password</td>
-                    <td th:text="${user.phoneNumber}">phone number</td>
-                    <td th:text="${user.role}">role</td>
+                <tr th:each="user : ${users}" 
+                    th:data-href="@{/users/{id}(id=${user.id})}"
+                    th:onclick="'window.location.href=\'' + @{/users/{id}(id=${user.id})} + '\''">
+                    <td th:text="${user.id}"></td>
+                    <td th:text="${user.username}"></td>
+                    <td><span class="password-mask">•••••••</span></td>
+                    <td th:text="${user.phoneNumber}"></td>
+                    <td>
+                        <span th:classappend="${user.role == 'ADMIN'} ? 'role-admin' : 'role-user'" 
+                              class="role-badge"
+                              th:text="${user.role}">
+                        </span>
+                    </td>
                 </tr>
             </tbody>
         </table>
     </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Row click handler
+            document.querySelectorAll('tr[data-href]').forEach(row => {
+                row.addEventListener('click', (e) => {
+                    if (!e.target.closest('a, button')) {
+                        window.location.href = row.dataset.href;
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

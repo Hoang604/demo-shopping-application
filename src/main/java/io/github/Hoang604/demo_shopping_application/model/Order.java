@@ -41,7 +41,7 @@ public class Order {
     public Order(){
         this.user = null;
         this.orderDate = new java.sql.Timestamp(System.currentTimeMillis());
-        this.status = "";
+        this.status = "ongoing";
         this.product = null;
         this.quantity = 0;
     }

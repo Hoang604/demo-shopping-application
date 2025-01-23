@@ -3,158 +3,285 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Products</title>
+    <title>Product Management</title>
     <link rel="stylesheet" href="styles.css">
     <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --danger-color: #e74c3c;
+            --success-color: #27ae60;
+            --light-gray: #ecf0f1;
+            --text-color: #2c3e50;
+            --transition: all 0.3s ease;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background-color: #f8f9fa;
-            color: #333;
-            text-align: center;
-            padding: 50px;
-        }
-        .container {
-            border: 1px solid #dee2e6;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            display: inline-block;
-            width: 80%;
-            margin: auto;
-        }
-        h1 {
-            font-size: 2em;
-        }
-        .dropdown {
-            margin-bottom: 20px;
-        }
-        .create-button {
-            display: inline-block;
-            padding: 10px 20px;
-            margin-bottom: 20px;
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            border-radius: 5px;
-            text-decoration: none;
-        }
-        .create-button:hover {
-            background-color: #555;
-        }
-        .product-item {
-            display: flex;
-            align-items: center;
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin-bottom: 10px;
-            text-decoration: none;
-            color: inherit;
-            transition: background-color 0.3s;
-            cursor: pointer; /* Thêm con trỏ chuột để chỉ ra rằng đây là một phần tử có thể nhấn */
-        }
-        .product-item:hover {
-            background-color: #f1f1f1;
-        }
-        .product-item img {
-            max-width: 100px;
-            margin-right: 20px;
-        }
-        .product-details {
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
         }
-        .product-details h2 {
-            margin: 0;
-            font-size: 1.2em;
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            flex: 1;
         }
-        .product-details p {
-            margin: 5px 0;
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            padding: 2rem 0;
+            background: linear-gradient(135deg, var(--primary-color), #34495e);
+            color: white;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
         }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .dropdown {
+            flex: 1;
+            max-width: 300px;
+        }
+
+        select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid var(--light-gray);
+            border-radius: 8px;
+            background: white;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        select:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .create-button {
+            background: var(--secondary-color);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .create-button:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem 0;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 3px solid var(--light-gray);
+        }
+
+        .product-content {
+            padding: 1.5rem;
+        }
+
+        .product-title {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .product-price {
+            font-size: 1.1rem;
+            color: var(--success-color);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
         .product-actions {
-            margin-left: auto;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: var(--light-gray);
         }
-        .product-actions button {
-            background-color: #dc3545;
-            color: #fff;
+
+        .delete-btn {
+            background: var(--danger-color);
+            color: white;
             border: none;
-            padding: 5px 10px;
-            border-radius: 3px;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: var(--transition);
+            font-weight: 500;
         }
-        .product-actions button:hover {
-            background-color: #c82333;
+
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #7f8c8d;
+            border: 2px dashed var(--light-gray);
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        footer {
+            background: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .filter-bar {
+                flex-direction: column;
+            }
+            
+            .dropdown {
+                max-width: 100%;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>Products List</h1>
-        <div th:if="${category != null}">
-            <h2 th:text="${category.name}">Category Name</h2>
-        </div>
-        <div th:if="${message != null}">
-            <p th:text="${message}"></p>
+        <div class="container">
+            <h1>Product Management</h1>
+            <div th:if="${category != null}">
+                <h2 th:text="${category.name}" style="font-weight: 500; font-size: 1.5rem;"></h2>
+            </div>
         </div>
     </header>
-    <main>
-        <div class="container">
+
+    <main class="container">
+        <div class="filter-bar">
             <div class="dropdown">
-                <label for="categorySelect">Select Category:</label>
-                <select id="categorySelect" onchange="filterByCategory()">
+                <select id="categorySelect" onchange="filterByCategory()" aria-label="Select category">
                     <option value="">All Categories</option>
-                    <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
+                    <option th:each="category : ${categories}" 
+                            th:value="${category.id}" 
+                            th:text="${category.name}"></option>
                 </select>
             </div>
-            <a href="/products/new" class="create-button">Create New Product</a>
-            <section id="products">
-                <ul>
-                    <!-- Sử dụng Thymeleaf để lặp qua danh sách sản phẩm và hiển thị chúng -->
-                    <li th:each="product : ${products}" class="product-item" th:onclick="'window.location.href=\'/products/' + ${product.id} + '\';'">
-                        <img th:src="${product.image}" alt="Product Image">
-                        <div class="product-details">
-                            <h2 th:text="${product.title}">Product Title</h2>
-                            <p>Price: <span th:text="${product.price}">0.00</span></p>
-                        </div>
-                        <div class="product-actions">
-                            <button th:onclick="'deleteProduct(' + ${product.id} + ')'">Delete</button>
-                        </div>
-                    </li>
-                </ul>
-                <div th:if="${#lists.isEmpty(products)}">
-                    <p>No products available in this category.</p>
-                </div>
-            </section>
+            <a href="/products/new" class="create-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 5v14M5 12h14"/>
+                </svg>
+                New Product
+            </a>
         </div>
+
+        <section id="products">
+            <div th:if="${#lists.isEmpty(products)}" class="empty-state">
+                No products found in this category
+            </div>
+
+            <div class="products-grid">
+                <div th:each="product : ${products}" class="product-card" th:onclick="'window.location.href=\'/products/' + ${product.id} + '\';'">
+                    <img th:src="${product.image}" class="product-image" alt="Product image">
+                    <div class="product-content">
+                        <h3 class="product-title" th:text="${product.title}"></h3>
+                        <div class="product-price">
+                            $<span th:text="${#numbers.formatDecimal(product.price, 1, 2)}"></span>
+                        </div>
+                    </div>
+                    <div class="product-actions">
+                        <button class="delete-btn" 
+                                th:onclick="'event.stopPropagation(); deleteProduct(' + ${product.id} + ')'">
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
+
     <footer>
-        <p>&copy; 2023 Shopping Application</p>
+        <p>&copy; 2023 Shopping Application. All rights reserved.</p>
     </footer>
+
     <script>
         function filterByCategory() {
-            var categoryId = document.getElementById("categorySelect").value;
-            var url = "/products";
-            if (categoryId) {
-                url += "?categoryId=" + categoryId;
-            }
-            window.location.href = url;
+            const categoryId = document.getElementById("categorySelect").value;
+            window.location.href = categoryId ? `/products?categoryId=${categoryId}` : '/products';
         }
 
         function deleteProduct(productId) {
-            fetch(`/products/delete/${productId}`, {
-                method: 'DELETE'
-            }).then(response => {
-                if (response.ok) {
-                    alert('Product deleted successfully');
-                    window.location.href = '/products/';
-                } else {
-                    alert('Failed to delete product');
-                }
-            }).catch(error => {
-                console.error('Error:', error);
-                alert('Failed to delete product');
-            });
+            if (confirm('Are you sure you want to delete this product?')) {
+                fetch(`/products/delete/${productId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        alert('Failed to delete product');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting');
+                });
+            }
         }
     </script>
 </body>
