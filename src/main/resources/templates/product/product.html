@@ -135,24 +135,60 @@
             text-align: center;
         }
 
-        .buy-button {
-            background: var(--success-color);
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-size: 1.1rem;
-            font-weight: 600;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.8rem;
+        /* CẢI THIỆN GIAO DIỆN NÚT */
+        .buy-button-group {
+            display: flex;
+            gap: 1.5rem; /* Tăng khoảng cách giữa các nút */
+            margin-top: 2rem;
+            justify-content: center; /* Căn giữa theo chiều ngang */
         }
 
-        .buy-button:hover {
-            background: #219a52;
+        .buy-button {
+            flex: 1;
+            min-width: 220px;
+            max-width: 280px;
+            padding: 1.2rem 2rem !important; /* Đồng nhất padding */
+            border-radius: 12px !important; /* Bo góc lớn hơn */
+            font-size: 1.1rem !important;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px; /* Cân bằng khoảng cách icon và text */
+            border: 2px solid transparent; /* Thêm viền trong suốt */
+        }
+
+        /* Màu sắc và hiệu ứng cho từng nút */
+        .buy-button[style*="background: var(--secondary-color);"] {
+            background: var(--secondary-color) !important;
+            color: white !important;
+        }
+
+        .buy-button[style*="background: var(--secondary-color);"]:hover {
+            background: #2980b9 !important; /* Màu hover đậm hơn */
             transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3); /* Hiệu ứng shadow */
+        }
+
+        /* Hiệu ứng cho nút Purchase Now */
+        .buy-button:not([style*="background: var(--secondary-color);"]) {
+            background: var(--success-color) !important;
+            color: white !important;
+        }
+
+        .buy-button:not([style*="background: var(--secondary-color);"]):hover {
+            background: #219a52 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        /* Đồng nhất kích thước icon */
+        .buy-button svg {
+            width: 24px;
+            height: 24px;
+            stroke-width: 2.5px; /* Làm đậm icon */
         }
 
         footer {
@@ -199,7 +235,7 @@
             const { _csrf, ...data } = Object.fromEntries(formData);
             
             try {
-                const response = await fetch(`/users/${userId}/orders/`, { // Sửa template literal
+                const response = await fetch(`/users/${userId}/orders/`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -225,7 +261,7 @@
 
                     // Xử lý kết quả sau khi hộp thoại đóng
                     if (result.isConfirmed) {
-                        window.location.href = `/users/${userId}/orders/`; // Sử dụng template literal
+                        window.location.href = `/users/${userId}/orders/`;
                     } else if (result.isDismissed) {
                         window.location.href = '/products/';
                     }
@@ -249,7 +285,7 @@
         });
     </script>
 </head>
-<body>
+<body>    
     <header>
         <div class="container">
             <h1>Product Details</h1>
@@ -294,20 +330,92 @@
                                value="1" 
                                required>
                     </div>
+                </form>
 
+                <div class="buy-button-group">
+                    <!-- Nút Purchase Now -->
                     <button type="button" class="buy-button" th:onclick="'submitOrderForm(' + ${userId} + ')'">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
                             <line x1="3" y1="6" x2="21" y2="6"></line>
                             <path d="M16 10a4 4 0 0 1-8 0"></path>
                         </svg>
                         Purchase Now
                     </button>
-                </form>
+
+                    <!-- Nút Add to Cart -->
+                    <button type="button" class="buy-button" style="background: var(--secondary-color);" th:onclick="'addToCart()'">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="9" cy="21" r="1"></circle>
+                            <circle cx="20" cy="21" r="1"></circle>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                        </svg>
+                        Add to Cart
+                    </button>
+                </div>
             </div>
         </div>
     </main>
+    <script>
+        async function addToCart() {
+            const form = document.getElementById('orderForm');
+            const formData = new FormData(form);
+            const jsonData = JSON.stringify(Object.fromEntries(formData));
+            const csrfToken = document.querySelector("input[name='_csrf']").value;
+            const dataObject = JSON.parse(jsonData);
 
+            const userId = dataObject.userId;
+            try {
+                const response = await fetch (`/users/${userId}/cart/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: jsonData
+                });
+
+                if (response.ok) {
+                    const result = await Swal.fire({
+                        title: 'Success!',
+                        text: 'Product added to cart',
+                        icon: 'success',
+                        confirmButtonColor: 'var(--success-color)',
+                        confirmButtonText: 'View Cart',
+                        showConfirmButton: true,
+                        showCancelButton: true,
+                        cancelButtonText: 'Continue Shopping',
+                        cancelButtonColor: 'var(--primary-color)',
+                        timer: 3000,
+                        timerProgressBar: true
+                    });
+                    if (result.isConfirmed) {
+                        window.location.href = `/users/${userId}/cart/`;
+                    } else if (result.isDismissed){
+                        window.location.href = '/products/';
+                    }
+
+                } else {
+                    await Swal.fire({
+                        title: 'Error!',
+                        text: 'Error with status: ' + response.status,
+                        icon: 'error',
+                        confirmButtonColor: 'var(--error-color)',
+                        confirmButtonText: 'OK'
+                    });
+                }
+                
+            } catch (error) {
+                await Swal.fire({
+                    title: 'Error!',
+                    text: error.message || 'Something went wrong',
+                    icon: 'error',
+                    confirmButtonColor: 'var(--danger-color)',
+                    confirmButtonText: 'Try Again'
+                });
+            }
+        }
+    </script>
     <footer>
         <p>&copy; 2025 Shopping Application. All rights reserved.</p>
     </footer>

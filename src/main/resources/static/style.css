@@ -1,60 +1,124 @@
-/* styles.css */
-.auth-buttons {
-    position: absolute;
-    top: 20px;
-    right: 20px;
+/* ========== CUSTOM PROPERTIES ========== */
+:root {
+  --primary-color: #2c3e50;       /* Màu chính */
+  --secondary-color: #3498db;     /* Màu phụ */
+  --accent-color: #e74c3c;        /* Màu nhấn */
+  --light-color: #ecf0f1;         /* Màu sáng */
+  --dark-color: #2c3e50;          /* Màu tối */
+  --success-color: #27ae60;       /* Màu thành công */
+  --shadow: 0 2px 15px rgba(0,0,0,0.1);
+  --transition: all 0.3s ease;
 }
 
-.auth-button {
-    display: inline-block;
-    padding: 8px 16px;
-    margin-left: 10px;
-    background-color: #4CAF50;
-    color: white;
-    text-decoration: none;
-    border-radius: 4px;
+/* ========== NAVIGATION BAR ========== */
+.navbar {
+  background: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  box-shadow: var(--shadow);
+  padding: 1rem 0;
 }
 
-.auth-button:hover {
-    background-color: #45a049;
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.logout-button {
-    background-color: #f44336;
+/* Logo */
+.nav-logo {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: var(--transition);
 }
 
-.logout-button:hover {
-    background-color: #da190b;
+.nav-logo:hover {
+  color: var(--secondary-color);
+  transform: translateY(-2px);
 }
 
-form {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #f9f9f9;
+/* Menu chính */
+.nav-menu {
+  display: flex;
+  gap: 2.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  align-items: center;
 }
 
-label {
-    display: block;
-    margin-bottom: 10px;
-    font-weight: bold;
+.nav-link {
+  position: relative;
+  color: var(--dark-color);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 0;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-input[type="text"], input[type="password"] {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 20px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--secondary-color);
+  transition: var(--transition);
 }
 
-button {
-    padding: 10px 20px;
-    background-color: #333;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+.nav-link:hover::after {
+  width: 100%;
+}
+
+.nav-link:hover {
+  color: var(--secondary-color);
+}
+
+.nav-link.active {
+  color: var(--secondary-color);
+  font-weight: 600;
+}
+
+/* Nút hamburger (mobile) */
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  z-index: 1001;
+}
+
+.hamburger .bar {
+  display: block;
+  width: 25px;
+  height: 3px;
+  margin: 5px auto;
+  background: var(--dark-color);
+  transition: var(--transition);
+}
+
+/* Hiệu ứng khi menu mở */
+.hamburger.active .bar:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+
+.hamburger.active .bar:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.active .bar:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
 }

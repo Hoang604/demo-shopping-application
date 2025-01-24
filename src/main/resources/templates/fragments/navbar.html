@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- Phần head không cần thiết cho fragment -->
+</head>
+<body>
+
+    <!-- NAVBAR FRAGMENT -->
+    <nav class="navbar" th:fragment="navbar">
+        <div class="nav-container">
+            <!-- Logo -->
+            <a th:href="@{/home}" class="nav-logo">
+                My App
+            </a>
+
+            <!-- Menu hamburger (mobile) -->
+            <button class="hamburger" id="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+
+            <!-- Menu chính -->
+            <ul class="nav-menu" id="navMenu">
+                <li>
+                    <a th:href="@{/home}" class="nav-link" 
+                       th:classappend="${#httpServletRequest.requestURI == '/home'} ? 'active'">
+                        Trang chủ
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/products}" class="nav-link" 
+                       th:classappend="${#httpServletRequest.requestURI.startsWith('/products')} ? 'active'">
+                        Sản phẩm
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Script cho navbar -->
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburger = document.getElementById('hamburger');
+            const navMenu = document.getElementById('navMenu');
+
+            // Toggle menu mobile
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                navMenu.classList.toggle('active');
+            });
+
+            // Đóng menu khi click ra ngoài
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.nav-container')) {
+                    hamburger.classList.remove('active');
+                    navMenu.classList.remove('active');
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

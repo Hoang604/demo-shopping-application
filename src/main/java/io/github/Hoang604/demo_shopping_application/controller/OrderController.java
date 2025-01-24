@@ -1,8 +1,6 @@
 package io.github.Hoang604.demo_shopping_application.controller;
 
 import io.github.Hoang604.demo_shopping_application.service.OrderService;
-import io.github.Hoang604.demo_shopping_application.service.ProductService;
-import io.github.Hoang604.demo_shopping_application.service.UserService;
 import io.github.Hoang604.demo_shopping_application.dto.CreateOrderDTO;
 import io.github.Hoang604.demo_shopping_application.model.MyUserDetails;
 import io.github.Hoang604.demo_shopping_application.model.Order;
@@ -17,13 +15,9 @@ import org.springframework.http.HttpStatus;
 @RequestMapping("/users/{userId}/orders")
 public class OrderController {
     private final OrderService orderService;
-    private final UserService userService;
-    private final ProductService productService;
 
-    public OrderController(OrderService orderService, UserService userService, ProductService productService) {
+    public OrderController(OrderService orderService) {
         this.orderService = orderService;
-        this.userService = userService;
-        this.productService = productService;
     }
 
     @GetMapping("/")
@@ -48,11 +42,7 @@ public class OrderController {
 
     @PostMapping("/")
     public String saveOrder(@RequestBody CreateOrderDTO order, Model model) {
-        Order newOrder = new Order();
-        newOrder.setUser(userService.getUserById(order.userId()));
-        newOrder.setProduct(productService.getProductById(order.productId()));
-        newOrder.setQuantity(order.quantity());
-        orderService.saveOrder(newOrder);
+        Order newOrder = orderService.saveOrder(order);
         model.addAttribute("order", newOrder);
         model.addAttribute("message", "Order created successfully");
         return "order/order-confirmation";

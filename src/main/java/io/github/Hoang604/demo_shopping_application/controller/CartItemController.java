@@ -1,5 +1,6 @@
 package io.github.Hoang604.demo_shopping_application.controller;
 
+import io.github.Hoang604.demo_shopping_application.dto.CreateCartItemDTO;
 import io.github.Hoang604.demo_shopping_application.model.CartItem;
 import io.github.Hoang604.demo_shopping_application.model.MyUserDetails;
 import io.github.Hoang604.demo_shopping_application.service.CartItemService;
@@ -23,29 +24,25 @@ public class CartItemController {
     // get all cart items
     @GetMapping("/")
     public String getCart(Model model, Authentication authentication) {
-        MyUserDetails userDetails = (MyUserDetails) authentication.getPrincipal();
-        if (userDetails == null) {
-            return "error/401";
-        }
         List<CartItem> cartItems;
         if (isAdmin(authentication)) {
             cartItems = cartItemService.getAllCartItems();
         }
         else {
-            cartItems = cartItemService.getCartItemByUserId(userDetails.getId());
+            cartItems = cartItemService.getCartItemByUserId(getCurrentUserId(authentication));
         }
-        model.addAttribute("userId", userDetails.getId());
+        model.addAttribute("userId", getCurrentUserId(authentication));
         model.addAttribute("cartItems", cartItems);
-        return "cart";
+        return "cart/cart";
     }
 
     // add new cart item to cart
     @PostMapping("/")
-    public String createCartItem(@RequestBody CartItem cartItem, Model model) {
+    public String createCartItem(@RequestBody CreateCartItemDTO cartItem, Model model) {
         CartItem newCartItem = cartItemService.newCartItem(cartItem);
         model.addAttribute("cartItem", newCartItem);
         model.addAttribute("message", "Cart item created successfully");
-        return "cart-item-created";
+        return "cart/cart-item-created";
     }
 
     // get cart item by id from cart (use for display detail of cart item)
@@ -53,7 +50,7 @@ public class CartItemController {
     public String getCartItemById(@PathVariable int id, Model model) {
         CartItem cartItem = cartItemService.getCartItemById(id);
         model.addAttribute("cartItem", cartItem);
-        return "cart-item";
+        return "cart/cart-item";
     }
 
     @PutMapping("/{id}")

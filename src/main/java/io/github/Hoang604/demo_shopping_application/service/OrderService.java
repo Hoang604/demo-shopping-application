@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import io.github.Hoang604.demo_shopping_application.dto.CreateOrderDTO;
 import io.github.Hoang604.demo_shopping_application.model.Order;
 import io.github.Hoang604.demo_shopping_application.repository.OrderRepository;
 
@@ -11,13 +12,21 @@ import io.github.Hoang604.demo_shopping_application.repository.OrderRepository;
 @Service
 public class OrderService {
     private final OrderRepository orderRepository;
+    private final UserService userService;
+    private final ProductService productService;
 
-    public OrderService(OrderRepository orderRepository) {
+    public OrderService(OrderRepository orderRepository, UserService userService, ProductService productService) {
         this.orderRepository = orderRepository;
+        this.productService = productService;
+        this.userService = userService;
     }
 
-    public void saveOrder(Order order) {
-        orderRepository.save(order);
+    public Order saveOrder(CreateOrderDTO order) {
+        Order newOrder = new Order();
+        newOrder.setUser(userService.getUserById(order.userId()));
+        newOrder.setProduct(productService.getProductById(order.productId()));
+        newOrder.setQuantity(order.quantity());
+        return orderRepository.save(newOrder);
     }
 
     public void saveAllOrder(List<Order> orders) {
