@@ -258,7 +258,7 @@
     </main>
 
     <footer>
-        <p>&copy; 2023 Shopping Application. All rights reserved.</p>
+        <p>&copy; 2025 Shopping Application. All rights reserved.</p>
     </footer>
 
     <script>
@@ -288,7 +288,7 @@
         function deleteProduct(productId) {
             const csrfToken = document.querySelector('input[name="_csrf"]').value;
             try {
-                fetch('/products/' + productId, {
+                fetch(`/products/${productId}`, {
                     method: 'DELETE',
                     headers: {
                         'X-CSRF-TOKEN': csrfToken
@@ -306,7 +306,7 @@
                         });
                     } else {
                     const error = response.json();
-                    throw new Error(error.message || 'Failed to delete user');
+                    throw new Error(error.message || 'Failed to delete product');
                     }
                 });
             } catch (error) {

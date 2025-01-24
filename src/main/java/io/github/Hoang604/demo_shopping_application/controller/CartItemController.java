@@ -1,14 +1,17 @@
 package io.github.Hoang604.demo_shopping_application.controller;
 
 import io.github.Hoang604.demo_shopping_application.model.CartItem;
+import io.github.Hoang604.demo_shopping_application.model.MyUserDetails;
 import io.github.Hoang604.demo_shopping_application.service.CartItemService;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
-@RestController
-@RequestMapping("/users/{userId}/cart/")
+@Controller
+@RequestMapping("/users/{userId}/cart")
 public class CartItemController {
 
     private final CartItemService cartItemService;
@@ -18,15 +21,26 @@ public class CartItemController {
     }
 
     // get all cart items
-    @GetMapping
-    public String getCart(Model model) {
-        List<CartItem> cartItems = cartItemService.getAllCartItems();
+    @GetMapping("/")
+    public String getCart(Model model, Authentication authentication) {
+        MyUserDetails userDetails = (MyUserDetails) authentication.getPrincipal();
+        if (userDetails == null) {
+            return "error/401";
+        }
+        List<CartItem> cartItems;
+        if (isAdmin(authentication)) {
+            cartItems = cartItemService.getAllCartItems();
+        }
+        else {
+            cartItems = cartItemService.getCartItemByUserId(userDetails.getId());
+        }
+        model.addAttribute("userId", userDetails.getId());
         model.addAttribute("cartItems", cartItems);
         return "cart";
     }
 
     // add new cart item to cart
-    @PostMapping
+    @PostMapping("/")
     public String createCartItem(@RequestBody CartItem cartItem, Model model) {
         CartItem newCartItem = cartItemService.newCartItem(cartItem);
         model.addAttribute("cartItem", newCartItem);
@@ -35,14 +49,14 @@ public class CartItemController {
     }
 
     // get cart item by id from cart (use for display detail of cart item)
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public String getCartItemById(@PathVariable int id, Model model) {
         CartItem cartItem = cartItemService.getCartItemById(id);
         model.addAttribute("cartItem", cartItem);
         return "cart-item";
     }
 
-    @PutMapping("{id}")
+    @PutMapping("/{id}")
     public String updateCartItem(@PathVariable int id, @RequestBody CartItem cartItem, Model model) {
         if (cartItemService.getCartItemById(id) == null) {
             return "error/404";
@@ -53,12 +67,21 @@ public class CartItemController {
         return "redirect:/users/{userId}/cart/" + id;
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public String deleteCartItemById(@PathVariable int id, Model model) {
         if (cartItemService.getCartItemById(id) == null) {
             return "error/404";
         }
         cartItemService.deleteCartItemById(id);
         return "redirect:/users/{userId}/cart";
+    }
+    private boolean isAdmin(Authentication authentication) {
+        return authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+    }
+    // Lấy ID của User hiện tại
+    private Integer getCurrentUserId(Authentication authentication) {
+        MyUserDetails userDetails = (MyUserDetails)authentication.getPrincipal();
+        return userDetails.getId();
     }
 }

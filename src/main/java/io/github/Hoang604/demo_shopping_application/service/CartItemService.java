@@ -18,12 +18,12 @@ public class CartItemService {
         return cartItemRepository.findAll();
     }
 
-    public CartItem newCartItem(CartItem item) {
-        return cartItemRepository.save(item);
-    }
-
     public CartItem getCartItemById(int id) {
         return cartItemRepository.findById(id).orElse(null);
+    }
+
+    public CartItem newCartItem(CartItem item) {
+        return cartItemRepository.save(item);
     }
 
     public CartItem updateCartItem(CartItem item) {
@@ -32,6 +32,10 @@ public class CartItemService {
 
     public void deleteCartItemById(int id) {
         cartItemRepository.deleteById(id);
+    }
+
+    public List<CartItem> getCartItemByUserId(int userId) {
+        return cartItemRepository.findByUserId(userId);
     }
 
     public void deleteAllCartItems() {

@@ -5,34 +5,141 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Details</title>
     <style>
+        :root {
+            --primary: #2563eb;
+            --danger: #dc2626;
+            --success: #16a34a;
+            --background: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-            color: #333;
-            text-align: center;
-            padding: 50px;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 1rem;
         }
+
         .container {
-            border: 1px solid #dee2e6;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            display: inline-block;
-            width: 80%;
-            margin: auto;
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            width: 100%;
+            max-width: 640px;
+            position: relative;
+            overflow: hidden;
         }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary), #60a5fa);
+        }
+
         h1 {
-            font-size: 2em;
+            font-size: 1.875rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
         }
+
+        h1::before {
+            content: '📦';
+            font-size: 1.5em;
+        }
+
         .order-details {
-            text-align: left;
-            margin-top: 20px;
+            display: grid;
+            gap: 1.5rem;
         }
-        .order-details label {
-            font-weight: bold;
+
+        .detail-group {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e2e8f0;
         }
-        .order-details div {
-            margin-bottom: 10px;
+
+        label {
+            font-weight: 500;
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: var(--text);
+            font-size: 1rem;
+        }
+
+        .total-section {
+            background: #f1f5f9;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .delete-button {
+            margin-top: 1.5rem;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            background: var(--danger);
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .delete-button:hover {
+            background: #b91c1c;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px -1px rgb(220 38 38 / 0.2);
+        }
+
+        .delete-button svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .delete-button:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 1.5rem;
+                border-radius: 1rem;
+            }
+            
+            .detail-group {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
@@ -40,31 +147,117 @@
     <div class="container">
         <h1>Order Details</h1>
         <div class="order-details">
-            <div>
-                <label>Order Date:</label>
-                <span th:text="${order.orderDate}">2023-01-01 12:00:00</span>
+            <div class="detail-group">
+                <label>Order Date</label>
+                <span class="detail-value" th:text="${order.orderDate}">2023-01-01 12:00:00</span>
             </div>
-            <div>
-                <label>Status:</label>
-                <span th:text="${order.status}">Pending</span>
+            
+            <div class="detail-group">
+                <label>Status</label>
+                <span class="detail-value">
+                    <span th:switch="${order.status}" 
+                          th:class="${'status-badge ' + 
+                          (order.status == 'DELIVERED' ? 'bg-green-100 text-green-800' : 
+                           order.status == 'CANCELLED' ? 'bg-red-100 text-red-800' : 
+                           'bg-blue-100 text-blue-800')}"
+                          style="padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem">
+                        <th:block th:text="${order.status}"/>
+                    </span>
+                </span>
             </div>
-            <div>
-                <label>Product:</label>
-                <span th:text="${order.product.title}">Product Title</span>
+
+            <div class="detail-group">
+                <label>Product</label>
+                <span class="detail-value" th:text="${order.product.title}">Product Title</span>
             </div>
-            <div>
-                <label>Price:</label>
-                <span th:text="${order.product.price}">100.00</span>
+
+            <div class="detail-group">
+                <label>Unit Price</label>
+                <span class="detail-value" th:text="${'$' + order.product.price}">$100.00</span>
             </div>
-            <div>
-                <label>Quantity:</label>
-                <span th:text="${order.quantity}">1</span>
+
+            <div class="detail-group">
+                <label>Quantity</label>
+                <span class="detail-value" th:text="${order.quantity}">1</span>
             </div>
-            <div>
-                <label>Total:</label>
-                <span th:text="${order.product.price * order.quantity}">100.00</span>
+
+            <div class="total-section">
+                <div class="detail-group" style="border: none; padding: 0;">
+                    <label>Total Amount</label>
+                    <span class="detail-value" 
+                          style="font-size: 1.25rem; color: var(--primary)" 
+                          th:text="${'$' + (order.product.price * order.quantity)}">
+                        $100.00
+                    </span>
+                </div>
             </div>
+
+            <button type="button" class="delete-button" 
+                    th:onclick="'confirmDelete(' + ${order.user.id} + ', ' + ${order.id} + ')'">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+                Delete
+            </button>
         </div>
     </div>
+    <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function confirmDelete(userId, orderId) {
+        Swal.fire({
+                title: 'Delete this order?',
+                text: "This action cannot be undone!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    deleteOrder(userId, orderId); 
+                }
+            });
+    }
+    async function deleteOrder(userId, orderId) {
+        var csrfToken = document.querySelector('input[name="_csrf"]').value;
+        try {
+            const response = await fetch(`/users/${userId}/orders/${orderId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            });
+
+            if (response.ok) {
+                await Swal.fire({
+                    title: 'Order Deleted!',
+                    text: 'The order has been deleted successfully.',
+                    icon: 'success',
+                    confirmButtonColor: 'var(--success)',
+                    confirmButtonText: 'OK'
+                });
+                window.location.href = `/users/${userId}/orders/`;
+            } else {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'An error occurred while deleting the order.',
+                    icon: 'error',
+                    confirmButtonColor: 'var(--danger)',
+                    confirmButtonText: 'OK'
+                });
+            }
+        } catch (error) {
+            Swal.fire({
+                title: 'Error!',
+                text: error.message + `/users/${userId}/orders/${orderId}`,
+                icon: 'error',
+                confirmButtonColor: 'var(--danger)',
+                confirmButtonText: 'OK'
+            });
+        }
+    }
+</script>
 </body>
 </html>

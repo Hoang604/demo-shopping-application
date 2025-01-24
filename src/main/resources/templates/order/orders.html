@@ -184,7 +184,7 @@
         <h1>Order Management</h1>
         
         <div class="order-list">
-            <div th:each="order : ${orders}" class="order-card">
+            <div th:each="order : ${orders}" class="order-card" th:onclick="'window.location.href=\'/users/' + ${order.user.id} + '/orders/' + ${order.id} + '\';'">
                 <div class="order-header">
                     <div class="order-info">
                         <h2 class="order-id">Order #<span th:text="${order.id}"></span></h2>

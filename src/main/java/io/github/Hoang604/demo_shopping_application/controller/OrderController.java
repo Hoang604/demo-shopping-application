@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpStatus;
 
 @Controller
 @RequestMapping("/users/{userId}/orders")
@@ -75,10 +76,10 @@ public class OrderController {
         return "order/order";
     }
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
-    public String deleteOrderById(@PathVariable int id) {
+    public void deleteOrderById(@PathVariable int id) {
         orderService.deleteOrderById(id);
-        return "redirect:/users/{userId}/orders";
     }
 
     private boolean isAdmin(Authentication authentication) {
