@@ -90,17 +90,20 @@
             font-weight: 700;
         }
 
-        .rating-section {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            font-size: 1.1rem;
+        .rating-stars {
+            position: relative;
+            display: inline-flex;
+            font-size: 1.2em;
+            color: #ffd700; /* Màu sao vàng */
         }
 
-        .rating-stars {
-            color: var(--warning-color);
-            display: flex;
-            gap: 0.3rem;
+        .rating-overlay {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            background: rgb(255, 255, 255, 1); /* Màu nền phủ */
+            mix-blend-mode: overlay;
         }
 
         .category-badge {
@@ -257,7 +260,7 @@
                     <div class="rating-stars">
                         ★★★★★
                         <div class="rating-overlay" 
-                            th:style="'width: calc(100% - ' + (${product.ratingRate} * 20) + '%)'"></div>
+                            th:style="'width: calc(' + (100 - (${product.ratingRate} * 20)) + '%)'"></div>
                     </div>
                     <span>(<span th:text="${product.ratingCount}"></span> reviews)</span>
                 </div>
