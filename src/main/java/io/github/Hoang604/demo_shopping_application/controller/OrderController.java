@@ -27,15 +27,15 @@ public class OrderController {
         }
 
         List<Order> orders;
-
+        MyUserDetails userDetails = (MyUserDetails) authentication.getPrincipal();
+        int userId = userDetails.getId();
         if (isAdmin(authentication)) {
             orders = orderService.getAllOrders();
         }
         else {
-            MyUserDetails userDetails = (MyUserDetails) authentication.getPrincipal();
-            int userId = userDetails.getId();
             orders = orderService.getOrdersByUserId(userId);
         }
+        model.addAttribute("userId", userId);
         model.addAttribute("orders", orders);
         return "order/orders";
     }
