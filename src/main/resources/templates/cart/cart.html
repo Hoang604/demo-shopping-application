@@ -4,78 +4,225 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shopping Cart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --light-gray: #ecf0f1;
+            --text-color: #2c3e50;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-            color: #333;
-            text-align: center;
-            padding: 50px;
-        }
-        .container {
-            border: 1px solid #dee2e6;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            display: inline-block;
-            width: 80%;
-            margin: auto;
-        }
-        h1 {
-            font-size: 2em;
-        }
-        .cart-item {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: var(--text-color);
+            min-height: 100vh;
             display: flex;
+            flex-direction: column;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            flex: 1;
+        }
+
+
+        .h1container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 0;
+            padding-bottom: 1.2rem;
+            flex: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-top: 0;
+            padding: 1rem 0;
+            background: linear-gradient(135deg, var(--primary-color), #34495e);
+            color: white;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            padding: 0;
+            margin: 0;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+        /* Nâng cấp phần cart items */
+        #cart-items {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .cart-list {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .cart-item {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            display: grid;
+            grid-template-columns: 120px 1fr auto;
+            gap: 2rem;
             align-items: center;
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin-bottom: 10px;
-            text-decoration: none;
-            color: inherit;
-            transition: background-color 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
+
         .cart-item:hover {
-            background-color: #f1f1f1;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
         }
+
+        .cart-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: var(--secondary-color);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .cart-item:hover::before {
+            opacity: 1;
+        }
+
         .cart-item img {
-            max-width: 100px;
-            margin-right: 20px;
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
         }
+
         .cart-details {
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
+            gap: 0.8rem;
         }
-        .cart-details h2 {
+
+        .product-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--primary-color);
             margin: 0;
-            font-size: 1.2em;
         }
-        .cart-details p {
-            margin: 5px 0;
+
+        .price-tag {
+            background: var(--light-gray);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
         }
+
+        .price-tag::before {
+            content: '💰';
+            font-size: 1.1em;
+        }
+
         .cart-quantity {
-            margin-left: auto;
-            text-align: right;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .quantity-badge {
+            background: var(--secondary-color);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 4rem;
+            border: 2px dashed var(--light-gray);
+            border-radius: 12px;
+            color: #7f8c8d;
+        }
+
+        @media (max-width: 768px) {
+            .cart-item {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .cart-details {
+                align-items: center;
+            }
+
+            .cart-quantity {
+                flex-direction: row;
+                justify-content: center;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
 <body>
+    <th:block th:replace="~{fragments/navbar :: navbar}"></th:block>
+    <header>
+        <div class="h1container">
+            <h1>Cart Management</h1>
+        </div>
+    </header>
+    
     <div class="container">
-        <h1>Shopping Cart</h1>
         <section id="cart-items">
-            <ul>
-                <!-- Sử dụng Thymeleaf để lặp qua danh sách các mục giỏ hàng và hiển thị chúng -->
-                <li th:each="cartItem : ${cartItems}" class="cart-item">
+            <div th:if="${#lists.isEmpty(cartItems)}" class="empty-cart">
+                <i class="fas fa-shopping-cart fa-3x"></i>
+                <h2>Your cart is empty</h2>
+                <p>Start adding items to your cart!</p>
+            </div>
+
+            <div class="cart-list" th:unless="${#lists.isEmpty(cartItems)}">
+                <div th:each="cartItem : ${cartItems}" 
+                     class="cart-item" 
+                     th:onclick="'window.location.href=\'/users/' + ${userId} + '/cart/' + ${cartItem.id} + '\';'">
                     <img th:src="${cartItem.product.image}" alt="Product Image">
                     <div class="cart-details">
-                        <h2 th:text="${cartItem.product.title}">Product Title</h2>
-                        <p>Price: <span th:text="${cartItem.product.price}">0.00</span></p>
+                        <h2 class="product-title" th:text="${cartItem.product.title}"></h2>
+                        <div class="price-tag">
+                            $<span th:text="${#numbers.formatDecimal(cartItem.product.price, 1, 2)}"></span>
+                        </div>
                     </div>
                     <div class="cart-quantity">
-                        <p>Quantity: <span th:text="${cartItem.quantity}">1</span></p>
+                        <div class="quantity-badge" th:text="${cartItem.quantity}"></div>
                     </div>
-                </li>
-            </ul>
+                </div>
+            </div>
         </section>
     </div>
 </body>

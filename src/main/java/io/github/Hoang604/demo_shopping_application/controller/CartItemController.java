@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.security.core.Authentication;
 
+import org.springframework.http.HttpStatus;
 import java.util.List;
 
 @Controller
@@ -47,9 +48,11 @@ public class CartItemController {
 
     // get cart item by id from cart (use for display detail of cart item)
     @GetMapping("/{id}")
-    public String getCartItemById(@PathVariable int id, Model model) {
+    public String getCartItemById(@PathVariable int id, Model model, Authentication authentication) {
         CartItem cartItem = cartItemService.getCartItemById(id);
         model.addAttribute("cartItem", cartItem);
+        MyUserDetails userDetails = (MyUserDetails) authentication.getPrincipal();
+        model.addAttribute("userId", userDetails.getId());
         return "cart/cart-item";
     }
 
@@ -64,6 +67,7 @@ public class CartItemController {
         return "redirect:/users/{userId}/cart/" + id;
     }
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     public String deleteCartItemById(@PathVariable int id, Model model) {
         if (cartItemService.getCartItemById(id) == null) {

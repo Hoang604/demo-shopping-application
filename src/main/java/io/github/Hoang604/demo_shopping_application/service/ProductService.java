@@ -53,12 +53,17 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 
-    public List<Product> getAllProducts() {
+    public List<Product> getProductsByCategory(Integer categoryId) {
+        if (categoryId != null) {
+            Category category = categoryService.getCategoryById(categoryId);
+            if (category != null) {
+                return productRepository.findByCategory(category);
+            }
+        }
         return productRepository.findAll();
     }
-
     public List<Product> findByTitle(String title) {
-        return productRepository.findByTitle(title);
+        return productRepository.findByTitleContainingIgnoreCase(title);
     }
 
     public List<Product> findByPrice(double price) {

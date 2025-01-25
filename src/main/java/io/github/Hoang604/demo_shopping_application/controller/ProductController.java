@@ -14,8 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.ui.Model;
 import org.springframework.http.HttpStatus;
-
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Controller
@@ -32,23 +31,18 @@ public class ProductController {
 
 
     @GetMapping("/")
-    public String getAllProducts(@RequestParam(required = false) Integer categoryId, Model model) {
-        System.out.println("categoryId: " + categoryId);
-        if (categoryId != null) {
-            System.out.println("categoryId: " + categoryId);
+    public String getAllProducts(@RequestParam(required = false) Integer categoryId, Model model, Authentication authentication) {
+        List<Product> products = productService.getProductsByCategory(categoryId);
+        model.addAttribute("products", products);
+        if (categoryId != null){
             Category category = categoryService.getCategoryById(categoryId);
             model.addAttribute("category", category);
-            if (category == null) {
-                return "error/404";
-            }
-            List<Product> products = productService.findByCategory(category);
-            model.addAttribute("products", products);
-        } else {
-            List<Product> products = productService.getAllProducts();
-            model.addAttribute("products", products);
         }
         List<Category> categories = categoryService.getAllCategories();
         model.addAttribute("categories", categories);
+
+        MyUserDetails userDetails = (MyUserDetails) authentication.getPrincipal();
+        model.addAttribute("userId", userDetails.getId());
         return "product/products";
     }
 
@@ -113,54 +107,14 @@ public class ProductController {
         return "product/create-product";
     }
 
-    @GetMapping("/search")
-    public String redirectSearch() {
-        return "redirect:/products/search/";
-    }
-
     @GetMapping("/search/")
     public String searchProducts(
-            @RequestParam(required = false) String title,
-            @RequestParam(required = false) Double price,
-            @RequestParam(required = false) Category category,
-            @RequestParam(required = false) Integer ratingRate,
-            @RequestParam(required = false) Integer ratingCount,
-            @RequestParam(required = false) Double minPrice,
-            @RequestParam(required = false) Double maxPrice,
-            @RequestParam(required = false) Double minRatingRate,
-            @RequestParam(required = false) Double maxRatingRate,
-            @RequestParam(required = false) Double minRatingCount,
-            @RequestParam(required = false) Double maxRatingCount,
-            Model model) {
-
-        List<Product> products;
-        products = new ArrayList<Product>();
-
-        if (title != null) {
-            products = productService.findByTitle(title);
-        }
-        if (price != null) {
-            products.addAll(productService.findByPrice(price));
-        }
-        if (category != null && minPrice != null && maxPrice != null) {
-            products.addAll(productService.findByCategoryAndPriceBetween(category, minPrice, maxPrice));
-        }
-        if (category != null && minRatingRate != null && maxRatingRate != null) {
-            products.addAll(productService.findByCategoryAndRatingRateBetween(category, minRatingRate, maxRatingRate));
-        }
-        if (category != null && minRatingCount != null && maxRatingCount != null) {
-            products.addAll(productService.findByCategoryAndRatingCountBetween(category, minRatingCount, maxRatingCount));
-        }
-        if (minPrice != null && maxPrice != null) {
-            products.addAll(productService.findByPriceBetween(minPrice, maxPrice));
-        }
-        if (minRatingRate != null && maxRatingRate != null) {
-            products.addAll(productService.findByRatingRateBetween(minRatingRate, maxRatingRate));
-        } 
-        if (minRatingCount != null && maxRatingCount != null) {
-            products.addAll(productService.findByRatingCountBetween(minRatingCount, maxRatingCount));
-        } 
-
+        @RequestParam(required = false) String title, Model model) {
+    
+        List<Product> products = title != null 
+            ? productService.findByTitle(title)
+            : Collections.emptyList();
+        
         model.addAttribute("products", products);
         return "product/products";
     }

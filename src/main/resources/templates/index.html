@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shopping Application</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
@@ -20,6 +19,7 @@
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             margin: 0;
+            line-height: 1.6;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -29,7 +29,7 @@
         header {
             background: var(--primary-color);
             color: white;
-            padding: 1.5rem 0;
+            padding: 1rem 0;
             box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
             position: relative;
         }
@@ -38,48 +38,6 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 1rem;
-        }
-
-        .nav-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .auth-buttons {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .auth-button {
-            padding: 0.8rem 1.5rem;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .login-button {
-            background: var(--secondary-color);
-            color: white;
-        }
-
-        .register-button {
-            background: var(--success-color);
-            color: white;
-        }
-
-        .logout-button {
-            background: var(--danger-color);
-            color: white;
-        }
-
-        .auth-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
         }
 
         main {
@@ -159,11 +117,6 @@
                 font-size: 2.5rem;
             }
             
-            .nav-bar {
-                flex-direction: column;
-                gap: 1rem;
-            }
-            
             .dashboard-grid {
                 grid-template-columns: 1fr;
             }
@@ -171,32 +124,7 @@
     </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <nav class="nav-bar">
-                <h1>Shopping App</h1>
-                <div class="auth-buttons">
-                    <th:block sec:authorize="!isAuthenticated()">
-                        <a href="/login" class="auth-button login-button">
-                            <i class="fas fa-sign-in-alt"></i>
-                            Login
-                        </a>
-                        <a href="/register" class="auth-button register-button">
-                            <i class="fas fa-user-plus"></i>
-                            Register
-                        </a>
-                    </th:block>
-                    <th:block sec:authorize="isAuthenticated()">
-                        <a href="#" class="auth-button logout-button" onclick="confirmLogout(event)">
-                            <i class="fas fa-sign-out-alt"></i>
-                            Logout
-                        </a>
-                    </th:block>
-                </div>
-            </nav>
-        </div>
-    </header>
-
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
     <main>
         <div class="container">
             <section class="hero-section">

@@ -1,64 +1,323 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <!-- Phần head không cần thiết cho fragment -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
+    <header th:fragment="navbar" class="main-navbar">
+        <style>
+            /* Scope toàn bộ CSS trong .main-navbar */
+            .main-navbar {
+                --nav-primary: #2c3e50;
+                --nav-secondary: #3498db;
+                --nav-success: #27ae60;
+                --nav-danger: #e74c3c;
+                --nav-text-light: #ecf0f1;
+                --nav-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+                --nav-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
 
-    <!-- NAVBAR FRAGMENT -->
-    <nav class="navbar" th:fragment="navbar">
-        <div class="nav-container">
-            <!-- Logo -->
-            <a th:href="@{/home}" class="nav-logo">
-                My App
-            </a>
+            /* Reset styles chỉ áp dụng cho navbar */
+            .main-navbar * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                list-style: none;
+                text-decoration: none;
+            }
 
-            <!-- Menu hamburger (mobile) -->
-            <button class="hamburger" id="hamburger">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </button>
+            .main-navbar nav {
+                background: linear-gradient(135deg, var(--nav-primary), var(--nav-secondary));
+                box-shadow: var(--nav-shadow);
+                padding: 1rem 2rem;
+                position: relative;
+                z-index: 1000;
+                margin-bottom: 0;
+            }
 
-            <!-- Menu chính -->
-            <ul class="nav-menu" id="navMenu">
-                <li>
-                    <a th:href="@{/home}" class="nav-link" 
-                       th:classappend="${#httpServletRequest.requestURI == '/home'} ? 'active'">
-                        Trang chủ
-                    </a>
-                </li>
-                <li>
-                    <a th:href="@{/products}" class="nav-link" 
-                       th:classappend="${#httpServletRequest.requestURI.startsWith('/products')} ? 'active'">
-                        Sản phẩm
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </nav>
+            .main-navbar .nav-container {
+                max-width: 1200px;
+                margin: 0 auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
 
-    <!-- Script cho navbar -->
-    <script th:inline="javascript">
-        document.addEventListener('DOMContentLoaded', function() {
-            const hamburger = document.getElementById('hamburger');
-            const navMenu = document.getElementById('navMenu');
+            .main-navbar .nav-logo {
+                display: flex;          /* Thêm dòng này */
+                align-items: center;    /* Thêm dòng này */
+                gap: 0.5rem;           /* Thêm dòng này */
+                font-family: 'Poppins', sans-serif;
+                font-size: 2rem;
+                font-weight: 600;
+                color: var(--nav-text-light);
+                transition: transform 0.3s ease;
+                margin-right: 30px;
+            }
 
-            // Toggle menu mobile
-            hamburger.addEventListener('click', () => {
-                hamburger.classList.toggle('active');
-                navMenu.classList.toggle('active');
-            });
+            /* Thêm phần này để căn chỉnh icon */
+            .main-navbar .nav-logo i {
+                font-size: 1.8rem;     /* Điều chỉnh kích thước icon */
+                margin-top: -3px;      /* Tinh chỉnh vị trí nếu cần */
+            }
 
-            // Đóng menu khi click ra ngoài
-            document.addEventListener('click', (e) => {
-                if (!e.target.closest('.nav-container')) {
-                    hamburger.classList.remove('active');
-                    navMenu.classList.remove('active');
+            .main-navbar .nav-logo:hover {
+                transform: scale(1.05);
+            }
+
+            .main-navbar .nav-content {
+                display: flex;
+                align-items: center;
+                gap: 2rem;
+            }
+
+            /* Main menu styles */
+            .main-navbar .nav-menu {
+                display: flex;
+                gap: 1.5rem;
+                margin: 0;
+                padding: 0;
+            }
+
+            .main-navbar .nav-menu a {
+                color: var(--nav-text-light);
+                padding: 0.8rem 1.2rem;
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                transition: var(--nav-transition);
+                position: relative;
+            }
+
+            .main-navbar .nav-menu a:hover {
+                background: rgba(255, 255, 255, 0.1);
+                transform: translateY(-2px);
+            }
+
+            .main-navbar .nav-menu a::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                width: 0;
+                height: 2px;
+                background: var(--nav-text-light);
+                transition: var(--nav-transition);
+            }
+
+            .main-navbar .nav-menu a:hover::after {
+                width: 80%;
+                left: 10%;
+            }
+
+            /* Dropdown menu */
+            .main-navbar .nav-menu > li {
+                position: relative; /* Quan trọng: Thiết lập context định vị */
+            }
+
+            .main-navbar .nav-dropdown {
+                position: absolute;
+                top: calc(100% + 5px); /* Thêm khoảng cách với menu cha */
+                left: 0;
+                background: white;
+                border-radius: 8px;
+                box-shadow: var(--nav-shadow);
+                padding: 0.5rem 0;
+                min-width: 200px;
+                opacity: 0;
+                visibility: hidden;
+                transition: var(--nav-transition);
+                z-index: 1000; /* Đảm bảo hiển thị trên các phần tử khác */
+            }
+
+            .main-navbar .nav-menu li:hover .nav-dropdown {
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
+            }
+
+            .main-navbar .nav-dropdown a {
+                color: var(--nav-primary);
+                padding: 0.8rem 1.5rem;
+                transition: var(--nav-transition);
+            }
+
+
+
+            .main-navbar .nav-dropdown a:hover {
+                background: #f8f9fa;
+                padding-left: 2rem;
+            }
+
+            .main-navbar .nav-dropdown a::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0;
+                height: 100%;
+                width: 3px;
+                background: var(--nav-secondary);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .main-navbar .nav-dropdown a:hover::before {
+                opacity: 1;
+            }
+
+            /* Auth buttons */
+            .main-navbar .nav-auth-buttons {
+                display: flex;
+                gap: 1rem;
+                align-items: center;
+            }
+
+            .main-navbar .nav-auth-btn {
+                color: var(--nav-text-light);
+                padding: 0.6rem 1.2rem;
+                border-radius: 25px;
+                transition: var(--nav-transition);
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                border: 2px solid transparent;
+            }
+
+            .main-navbar .nav-login {
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .main-navbar .nav-register {
+                background: var(--nav-success);
+            }
+
+            .main-navbar .nav-logout {
+                background: var(--nav-danger);
+            }
+
+            .main-navbar .nav-auth-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: var(--nav-shadow);
+            }
+            /* Trong phần CSS của .main-navbar */
+            .main-navbar .search-form {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                margin-right: 1rem;
+            }
+
+            .main-navbar .search-input {
+                padding: 0.6rem 1rem;
+                border: 2px solid rgba(255, 255, 255, 0.2);
+                border-radius: 25px;
+                background: rgba(255, 255, 255, 0.1);
+                color: var(--nav-text-light);
+                transition: var(--nav-transition);
+                width: 250px;
+            }
+
+            .main-navbar .search-input:focus {
+                outline: none;
+                border-color: var(--nav-secondary);
+                background: rgba(255, 255, 255, 0.2);
+            }
+
+            .main-navbar .search-btn {
+                background: transparent;
+                border: none;
+                color: var(--nav-text-light);
+                cursor: pointer;
+                padding: 0.5rem;
+                transition: var(--nav-transition);
+            }
+
+            .main-navbar .search-btn:hover {
+                color: var(--nav-secondary);
+            }
+
+            /* Responsive */
+            @media (max-width: 768px) {
+                .main-navbar .nav-menu {
+                    display: none;
                 }
-            });
-        });
-    </script>
+                
+                .main-navbar .nav-logo {
+                    font-size: 1.5rem;
+                }
+                
+                .main-navbar .nav-auth-buttons {
+                    gap: 0.5rem;
+                }
+            }
+        </style>
 
+        <nav>
+            <div class="nav-container">
+                <a href="/" class="nav-logo">
+                    <i class="fa fa-home"></i> MyDemoShop
+                </a>
+                
+                <div class="nav-content">
+                    <form th:action="@{/products/search/}" method="get" class="search-form">
+                        <input 
+                            type="search" 
+                            name="title" 
+                            placeholder="Search products..."
+                            aria-label="Search"
+                            class="search-input"
+                        >
+                        <button type="submit" class="search-btn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                    <ul class="nav-menu">
+                        <li><a href="/products"><i class="fas fa-box-open"></i>Products</a></li>
+                        <li>
+                            <a href="#"><i class="fas fa-list"></i>Categories</a>
+                            <ul class="nav-dropdown">
+                                <li><a href="/products/?categoryId=3"><i class="fas fa-tshirt"></i>Clothing</a></li>
+                                <li><a href="/products/?categoryId=1"><i class="fas fa-tv"></i>Electronics</a></li>
+                                <li><a href="/products/?categoryId=7"><i class="fas fa-ring"></i>Beauty</a></li>
+                            </ul>
+                        </li>
+                        <li><a th:href="@{'/users/' + ${userId} + '/cart/'}"><i class="fas fa-shopping-cart"></i>Cart</a></li>
+                        <li><a th:href="@{'/users/' + ${userId} + '/orders/'}"><i class="fas fa-clipboard"></i>Orders</a></li>
+                    </ul>
+
+                    <div class="nav-auth-buttons">
+                        <th:block sec:authorize="!isAuthenticated()">
+                            <a href="/login" class="nav-auth-btn nav-login">
+                                <i class="fas fa-sign-in-alt"></i>
+                                Login
+                            </a>
+                            <a href="/register" class="nav-auth-btn nav-register">
+                                <i class="fas fa-user-plus"></i>
+                                Register
+                            </a>
+                        </th:block>
+                        
+                        <th:block sec:authorize="isAuthenticated()">
+                            <a href="#" class="nav-auth-btn nav-logout" onclick="confirmLogout(event)">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Logout
+                            </a>
+                        </th:block>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <script>
+            function confirmLogout(e) {
+                e.preventDefault();
+                if (confirm('Are you sure you want to logout?')) {
+                    window.location.href = '/logout';
+                }
+            }
+        </script>
+    </header>
 </body>
 </html>
