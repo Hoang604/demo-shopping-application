@@ -211,41 +211,75 @@
             event.preventDefault();
             const csrfToken = document.querySelector('input[name="_csrf"]').value;
             const form = document.getElementById("createUserForm");
-            const formData = new FormData(form);
-            const data = Object.fromEntries(formData.entries());
-
+            
             try {
+                // Client-side validation
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+
+                // Prepare data
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
+                delete data._csrf;
+                const jsonData = JSON.stringify(data);
+                // API call
                 const response = await fetch('/users/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': csrfToken
                     },
-                    body: JSON.stringify(data)
+                    body: jsonData
                 });
 
-                if (response.ok) {
-                    await Swal.fire({
-                        icon: 'success',
-                        title: 'User Created!',
-                        text: 'The user has been created successfully.',
-                        showConfirmButton: true,
-                        timer: 2500,
-                        timerProgressBar: true
-                    });
-                    window.location.href = "/users/";
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Creation Failed',
-                        text: 'Failed to create user. Please try again.',
-                    });
+                // Handle response
+                const responseBody = await response.json();
+                
+                if (!response.ok) {
+                    let errorMessage = 'Failed to create user';
+                    
+                    // Handle specific error cases
+                    if (response.status === 403) {
+                        errorMessage = 'Access denied: Admin privileges required';
+                    } else if (response.status === 409) {
+                        errorMessage = responseBody.error || 'User already exists';
+                    } else if (response.status === 400) {
+                        errorMessage = responseBody.error|| 'Invalid request';
+                    } else if (responseBody.error) {
+                        errorMessage = responseBody.error;
+                    }
+                    
+                    throw new Error(errorMessage);
                 }
+
+                // Success handling
+                const result = await Swal.fire({
+                    icon: 'success',
+                    title: 'User Created!',
+                    text: responseBody.message,
+                    showConfirmButton: true,
+                    confirmButtonText: 'View User',
+                    showCancelButton: true,
+                    cancelButtonText: 'Back to Users List',
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+
+                // Navigation logic
+                if (result.isConfirmed) {
+                    window.location.href = response.headers.get('Location');
+                } else {
+                    window.location.href = "/users/";
+                }
+
             } catch (error) {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Error',
-                    text: error.message || 'An unexpected error occurred',
+                    title: 'Creation Failed',
+                    text: error.message,
+                    confirmButtonText: 'Try Again'
                 });
             }
         }

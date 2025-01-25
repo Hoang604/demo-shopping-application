@@ -280,8 +280,6 @@
             const csrfToken = form.querySelector('input[name="_csrf"]').value;
             const jsonData = JSON.stringify(Object.fromEntries(formData));
             
-            alert(jsonData);
-
             try {
                 const response = await fetch('/users/' + userId, {
                     method: 'PUT',

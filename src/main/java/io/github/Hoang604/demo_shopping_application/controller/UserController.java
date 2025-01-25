@@ -3,16 +3,26 @@ package io.github.Hoang604.demo_shopping_application.controller;
 import io.github.Hoang604.demo_shopping_application.model.MyUserDetails;
 import io.github.Hoang604.demo_shopping_application.model.User;
 import io.github.Hoang604.demo_shopping_application.service.UserService;
+import io.github.Hoang604.demo_shopping_application.utils.SecurityUtils;
+import jakarta.validation.Valid;
 import io.github.Hoang604.demo_shopping_application.dto.CreateUserWithRoleDTO;
 import io.github.Hoang604.demo_shopping_application.dto.UpdateUserDTO;
 
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.stereotype.Controller;
 import org.springframework.security.core.Authentication;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
+
+import java.net.URI;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/users")
@@ -25,22 +35,74 @@ public class UserController {
     }
 
     @GetMapping("/")
-    public String getAllUsers(Model model) {
+    public String getAllUsers(Model model, Authentication authentication) {
+        if (!SecurityUtils.isAdmin(authentication)) {
+            return "error/403";
+        }
         List<User> users = userService.getAllUsers();
         // Add users to model (it contain attributes that I want to render in view)
         model.addAttribute("users", users);
         return "user/users";
     }
 
-    @PostMapping(value = "/", consumes = "application/json")
-    public String createUser(@RequestBody CreateUserWithRoleDTO userDTO, Model model) {
-        if (userService.exist(userDTO.username())) {
-            model.addAttribute("error", "The user with username " + userDTO.username() + " already exists. Please choose another username.");
-            return "error/user-already-exists";
+    @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    // @Valid: validate the input (with the constraints defined in the DTO)
+    public ResponseEntity<?> createUser(@Valid @RequestBody CreateUserWithRoleDTO userDTO,
+            BindingResult bindingResult, Authentication authentication) {
+        try {
+            // 1. Authorization check
+            if (!SecurityUtils.isAdmin(authentication)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Collections.singletonMap("error", "Access denied"));
+            }
+            
+            // 2. Validation errors
+            if (bindingResult.hasErrors()) {
+                // bindingResult automaticaly contains the validation errors
+                Map<String, String> errors = bindingResult.getFieldErrors()
+                    .stream()
+                    .collect(Collectors.toMap(
+                        FieldError::getField,
+                        FieldError::getDefaultMessage,
+                        (existingMsg, newMsg) -> existingMsg + ", " + newMsg
+                        ));
+                String errorMessage = errors.values().stream()
+                    .collect(Collectors.joining(", "));
+                Map<String, String> error = Collections.singletonMap(
+                    "error", errorMessage
+                );
+                return ResponseEntity.badRequest()
+                    .body(error);
+            }
+
+            // 3. Check existing user
+            if (userService.exist(userDTO.username())) {
+                Map<String, String> error = Collections.singletonMap(
+                    "error", "Username '" + userDTO.username() + "' already exists"
+                );
+                System.out.println("Error: " + error);
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(error);
+            }
+            
+            // 4. Create user
+            User newUser = userService.createUserWithRole(userDTO);
+            
+            return ResponseEntity.created(
+                URI.create("/users/" + newUser.getId())
+            ).body(Collections.singletonMap(
+                "message", 
+                "User created successfully"
+            ));
+
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                .body(Collections.singletonMap(
+                    "error", 
+                    "Server error: " + e.getMessage()
+                ));
         }
-        User newUser = userService.createUserWithRole(userDTO);
-        model.addAttribute("message", "User created successfully");
-        return "redirect:user/user/" + newUser.getId();
     }
 
     @GetMapping("/new")

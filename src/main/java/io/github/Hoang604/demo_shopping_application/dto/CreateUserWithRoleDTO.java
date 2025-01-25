@@ -1,11 +1,25 @@
 package io.github.Hoang604.demo_shopping_application.dto;
 
-public record CreateUserWithRoleDTO(String username, String password, String phoneNumber, String role) {
-    public void print() {
-        System.out.println("Username: " + username);
-        System.out.println("Password: " + password);
-        System.out.println("Phone number: " + phoneNumber);
-        System.out.println("Role: " + role);
-    }
-    
-}
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
+public record CreateUserWithRoleDTO(
+    @NotBlank(message = "Username is required")
+    @Size(min = 3, max = 20, message = "Username must be 3-20 characters")
+    String username,
+
+    @NotBlank(message = "Password is required")
+    @Pattern(
+        regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$",
+        message = "Password must be at least 8 characters with letters and numbers"
+    )
+    String password,
+
+    @NotBlank(message = "Phone number is required")
+    @Pattern(regexp = "^\\d{10}$", message = "Invalid phone number format")
+    String phoneNumber,
+
+    @NotBlank(message = "Role is required")
+    String role
+) {}
