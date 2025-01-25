@@ -10,7 +10,12 @@ import org.springframework.ui.Model;
 import org.springframework.security.core.Authentication;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/users/{userId}/cart")
@@ -39,11 +44,24 @@ public class CartItemController {
 
     // add new cart item to cart
     @PostMapping("/")
-    public String createCartItem(@RequestBody CreateCartItemDTO cartItem, Model model) {
-        CartItem newCartItem = cartItemService.newCartItem(cartItem);
-        model.addAttribute("cartItem", newCartItem);
-        model.addAttribute("message", "Cart item created successfully");
-        return "cart/cart-item-created";
+    @ResponseBody
+    public ResponseEntity<?> createCartItem(@RequestBody CreateCartItemDTO cartItemDTO,
+                                            Authentication authentication) {
+        try {
+            // Kiểm tra userId có khớp với current user không (trừ admin)
+            if (!isAdmin(authentication) && !cartItemDTO.userId().equals(getCurrentUserId(authentication))) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+
+            CartItem newCartItem = cartItemService.newCartItem(cartItemDTO);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Item added to cart successfully");
+            response.put("cartItem", newCartItem);
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Collections.singletonMap("error", e.getMessage()));
+        }
     }
 
     // get cart item by id from cart (use for display detail of cart item)
@@ -54,17 +72,6 @@ public class CartItemController {
         MyUserDetails userDetails = (MyUserDetails) authentication.getPrincipal();
         model.addAttribute("userId", userDetails.getId());
         return "cart/cart-item";
-    }
-
-    @PutMapping("/{id}")
-    public String updateCartItem(@PathVariable int id, @RequestBody CartItem cartItem, Model model) {
-        if (cartItemService.getCartItemById(id) == null) {
-            return "error/404";
-        }
-        cartItem.setId(id);
-        cartItemService.updateCartItem(cartItem);
-        model.addAttribute("message", "Cart item updated successfully");
-        return "redirect:/users/{userId}/cart/" + id;
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
