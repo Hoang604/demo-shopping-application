@@ -3,125 +3,252 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create User</title>
-    <link rel="stylesheet" href="/styles.css">
-    <!-- Thêm SweetAlert2 CSS -->
+    <title>Create New User</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
-        form {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #f9f9f9;
+        :root {
+            --primary-color: #2563eb;
+            --text-color: #1e293b;
+            --light-gray: #f1f5f9;
+            --border-radius: 8px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
         label {
             display: block;
-            margin-bottom: 10px;
-            font-weight: bold;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+            color: var(--text-color);
         }
-        input[type="text"], input[type="password"] {
+
+        .input-field {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            padding: 0.875rem 1.25rem;
+            border: 2px solid #cbd5e1;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
         }
-        button {
-            padding: 10px 20px;
-            background-color: #333;
-            color: #fff;
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .password-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .toggle-label {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1em;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary-color);
+            color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
+            font-weight: 600;
             cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
         }
-        button:hover {
-            background-color: #555;
+
+        .submit-btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .form-card {
+                padding: 1.5rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
         }
     </style>
-    <!-- Thêm SweetAlert2 JS -->
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Create New User</h1>
+        </header>
+
+        <main>
+            <div class="form-card">
+                <form id="createUserForm" onsubmit="createUser(event)">
+                    <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" 
+                               id="username" 
+                               name="username" 
+                               class="input-field" 
+                               placeholder="Enter username"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" 
+                               id="password" 
+                               name="password" 
+                               class="input-field" 
+                               placeholder="••••••••"
+                               required>
+                        <div class="password-toggle">
+                            <input type="checkbox" 
+                                   id="showPassword" 
+                                   onclick="togglePasswordVisibility()">
+                            <label for="showPassword" class="toggle-label">Show Password</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phoneNumber">Phone Number</label>
+                        <input type="tel" 
+                               id="phoneNumber" 
+                               name="phoneNumber" 
+                               class="input-field" 
+                               placeholder="Enter phone number"
+                               pattern="[0-9]{10}"
+                               title="10-digit phone number"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="role">Role</label>
+                        <select id="role" 
+                                name="role" 
+                                class="input-field" 
+                                required>
+                            <option value="USER">User</option>
+                            <option value="ADMIN">Admin</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-user-plus"></i>
+                        Create User
+                    </button>
+                </form>
+            </div>
+        </main>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         function togglePasswordVisibility() {
-            var passwordField = document.getElementById("password");
-            var showPasswordCheckbox = document.getElementById("showPassword");
-            if (showPasswordCheckbox.checked) {
-                passwordField.type = "text";
-            } else {
-                passwordField.type = "password";
-            }
+            const passwordField = document.getElementById("password");
+            passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
         }
 
         async function createUser(event) {
-            event.preventDefault(); // Ngăn chặn hành vi mặc định của form
-
+            event.preventDefault();
+            const csrfToken = document.querySelector('input[name="_csrf"]').value;
             const form = document.getElementById("createUserForm");
             const formData = new FormData(form);
-            const data = {};
-            formData.forEach((value, key) => {
-                data[key] = value;
-            });
+            const data = Object.fromEntries(formData.entries());
 
             try {
-                const response = await fetch('/api/users', {
+                const response = await fetch('/users/', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
                     },
                     body: JSON.stringify(data)
                 });
 
                 if (response.ok) {
-                    Swal.fire({
+                    await Swal.fire({
                         icon: 'success',
-                        title: 'User created successfully!',
-                        showConfirmButton: false,
-                        timer: 2000
-                    }).then(() => {
-                        window.location.href = "/api/users";
+                        title: 'User Created!',
+                        text: 'The user has been created successfully.',
+                        showConfirmButton: true,
+                        timer: 2500,
+                        timerProgressBar: true
                     });
+                    window.location.href = "/users/";
                 } else {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Failed to create user.',
-                        showConfirmButton: false,
-                        timer: 2000
+                        title: 'Creation Failed',
+                        text: 'Failed to create user. Please try again.',
                     });
                 }
             } catch (error) {
-                console.error('Error:', error);
                 Swal.fire({
                     icon: 'error',
-                    title: 'Failed to create user.',
-                    showConfirmButton: false,
-                    timer: 2000
+                    title: 'Error',
+                    text: error.message || 'An unexpected error occurred',
                 });
             }
         }
     </script>
-</head>
-<body>
-    <header>
-        <h1>Create User</h1>
-    </header>
-    <main>
-        <form id="createUserForm" onsubmit="createUser(event)">
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" required>
-
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required>
-            <input type="checkbox" id="showPassword" onclick="togglePasswordVisibility()"> Show Password
-
-            <label for="phoneNumber">Phone Number</label>
-            <input type="text" id="phoneNumber" name="phoneNumber" required>
-
-            <label for="role">Role</label>
-            <input type="text" id="role" name="role" required>
-
-            <button type="submit">Create User</button>
-        </form>
-    </main>
 </body>
 </html>

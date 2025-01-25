@@ -3,7 +3,7 @@ package io.github.Hoang604.demo_shopping_application.controller;
 import io.github.Hoang604.demo_shopping_application.model.MyUserDetails;
 import io.github.Hoang604.demo_shopping_application.model.User;
 import io.github.Hoang604.demo_shopping_application.service.UserService;
-import io.github.Hoang604.demo_shopping_application.dto.CreateUserDTO;
+import io.github.Hoang604.demo_shopping_application.dto.CreateUserWithRoleDTO;
 import io.github.Hoang604.demo_shopping_application.dto.UpdateUserDTO;
 
 import org.springframework.web.bind.annotation.*;
@@ -33,12 +33,12 @@ public class UserController {
     }
 
     @PostMapping(value = "/", consumes = "application/json")
-    public String createUser(@RequestBody CreateUserDTO userDTO, Model model) {
+    public String createUser(@RequestBody CreateUserWithRoleDTO userDTO, Model model) {
         if (userService.exist(userDTO.username())) {
             model.addAttribute("error", "The user with username " + userDTO.username() + " already exists. Please choose another username.");
             return "error/user-already-exists";
         }
-        User newUser = userService.createUser(userDTO);
+        User newUser = userService.createUserWithRole(userDTO);
         model.addAttribute("message", "User created successfully");
         return "redirect:user/user/" + newUser.getId();
     }

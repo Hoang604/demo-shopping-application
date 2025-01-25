@@ -1,6 +1,7 @@
 package io.github.Hoang604.demo_shopping_application.service;
 
 import io.github.Hoang604.demo_shopping_application.dto.CreateUserDTO;
+import io.github.Hoang604.demo_shopping_application.dto.CreateUserWithRoleDTO;
 import io.github.Hoang604.demo_shopping_application.dto.UpdateUserDTO;
 import io.github.Hoang604.demo_shopping_application.model.User;
 import io.github.Hoang604.demo_shopping_application.repository.UserRepository;
@@ -64,5 +65,15 @@ public class UserService{
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    public User createUserWithRole(CreateUserWithRoleDTO userDTO) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+        User user = new User(
+                userDTO.username(),
+                encoder.encode(userDTO.password()),
+                userDTO.role(),
+                userDTO.phoneNumber());
+        return userRepository.save(user);
     }
 }

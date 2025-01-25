@@ -181,6 +181,13 @@
             padding-top: 1.5rem;
             border-top: 2px solid var(--light-gray);
         }
+        .empty-cart {
+            text-align: center;
+            padding: 4rem;
+            border: 2px dashed var(--light-gray);
+            border-radius: 12px;
+            color: #7f8c8d;
+        }
 
         @media (max-width: 768px) {
             .container {
@@ -221,6 +228,10 @@
         </div>
     </header>
     <div class="container">
+        <div th:if="${#lists.isEmpty(orders)}" class="empty-cart">
+                <i class="fas fa-shopping-cart fa-3x"></i>
+                <h2>Your orders is empty!</h2>
+            </div>
         <div class="order-list">
             <div th:each="order : ${orders}" class="order-card" 
                  th:onclick="'window.location.href=\'/users/' + ${order.user.id} + '/orders/' + ${order.id} + '\';'">
