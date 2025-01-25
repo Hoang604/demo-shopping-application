@@ -63,6 +63,7 @@ public class OrderController {
         }
 
         model.addAttribute("order", order);
+        model.addAttribute("userId", order.getUser().getId());
         return "order/order";
     }
 
