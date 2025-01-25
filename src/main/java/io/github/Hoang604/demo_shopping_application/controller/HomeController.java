@@ -12,7 +12,7 @@ public class HomeController {
     @GetMapping("/home")
     public String home(Authentication authentication, Model model) {
         if (authentication == null) {
-            return "login";
+            return "index";
         }
         MyUserDetails userDetails = (MyUserDetails) authentication.getPrincipal();
         model.addAttribute("userId", userDetails.getId());

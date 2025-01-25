@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Management</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    <html xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -253,7 +253,7 @@
                             th:text="${category.name}"></option>
                 </select>
             </div>
-            <a href="/products/new" class="create-button">
+            <a href="/products/new" class="create-button" sec:authorize="hasRole('ADMIN')">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 5v14M5 12h14"/>
                 </svg>
@@ -275,11 +275,13 @@
                             $<span th:text="${#numbers.formatDecimal(product.price, 1, 2)}"></span>
                         </div>
                     </div>
-                    <div class="product-actions">
-                        <button class="delete-btn" 
-                                th:onclick="'confirmDelete(event, ' + ${product.id} + ')'">
+                    <div class="product-actions" sec:authorize="hasRole('ADMIN')">
+                        <div sec:authorize="hasRole('ADMIN')">
+                            <button class="delete-btn" 
+                                    th:onclick="'confirmDelete(event, ' + ${product.id} + ')'">
                                 Delete
-                        </button>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

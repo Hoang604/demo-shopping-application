@@ -3,66 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
-    <link rel="stylesheet" href="/styles.css">
+    <title>Register - Shopping App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
-        form {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #f9f9f9;
+        :root {
+            --primary-color: #2563eb;
+            --text-color: #1e293b;
+            --light-gray: #f1f5f9;
+            --border-radius: 8px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        header {
+            text-align: center;
+            padding: 3rem 0 1rem;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
         label {
             display: block;
-            margin-bottom: 10px;
-            font-weight: bold;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-color);
         }
-        input[type="text"], input[type="password"] {
+
+        .input-field {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            padding: 0.875rem;
+            border: 2px solid #cbd5e1;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
         }
-        button {
-            padding: 10px 20px;
-            background-color: #333;
-            color: #fff;
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .password-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .toggle-label {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary-color);
+            color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
+            transition: var(--transition);
         }
-        button:hover {
-            background-color: #555;
+
+        .submit-btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #64748b;
+        }
+
+        .login-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .card {
+                padding: 1.5rem;
+            }
         }
     </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">MyShop</div>
+            <h1>Create New Account</h1>
+        </header>
+
+        <main>
+            <div class="card">
+                <form id="registerForm" onsubmit="createUser(event)">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" class="input-field" 
+                               placeholder="Enter your username" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" class="input-field" 
+                               placeholder="••••••••" required>
+                        <div class="password-toggle">
+                            <input type="checkbox" id="showPassword" 
+                                   onclick="togglePasswordVisibility()">
+                            <label for="showPassword" class="toggle-label">Show Password</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phoneNumber">Phone Number</label>
+                        <input type="tel" id="phoneNumber" class="input-field" 
+                               placeholder="Enter phone number" 
+                               pattern="[0-9]{10}" 
+                               title="10-digit phone number" 
+                               required>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Register Now</button>
+                </form>
+            </div>
+
+            <div class="login-link">
+                Already have an account? <a href="/login">Sign in</a>
+            </div>
+        </main>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         function togglePasswordVisibility() {
             const passwordField = document.getElementById("password");
-            const showPasswordCheckbox = document.getElementById("showPassword");
-            passwordField.type = showPasswordCheckbox.checked ? "text" : "password";
+            passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
         }
 
         async function createUser(event) {
             event.preventDefault();
-
-            // Lấy CSRF token từ form
             const csrfToken = document.querySelector("input[name='_csrf']").value;
 
-            // Tạo object dữ liệu đăng ký
             const formData = {
                 username: document.getElementById("username").value,
                 password: document.getElementById("password").value,
-                phoneNumber: document.getElementById("phoneNumber").value,
-                role: document.getElementById("role").value
+                phoneNumber: document.getElementById("phoneNumber").value
             };
 
             try {
-                // Gửi request đăng ký
                 const response = await fetch('/register', {
                     method: 'POST',
                     headers: {
@@ -73,94 +206,72 @@
                 });
 
                 if (response.ok) {
-                    Swal.fire({
+                    const result = await Swal.fire({
                         icon: 'success',
-                        title: 'Registration successful!',
-                        text: 'You will be auto logged in after 2 seconds.',
-                        showConfirmButton: false,
-                        timer: 2000
+                        title: 'Registration Successful!',
+                        html: `Auto login in 3 seconds...`,
+                        showConfirmButton: true,
+                        confirmButtonColor: 'var(--primary-color)',
+                        confirmButtonText: 'Login Now',
+                        timer: 3000,
+                        timerProgressBar: true,
+                        allowOutsideClick: false
                     });
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-                    // Tạo form ẩn để đăng nhập tự động
-                    const loginForm = document.createElement("form");
-                    loginForm.method = "POST";
-                    loginForm.action = "/login";
 
-                    // Thêm CSRF token
-                    const csrfInput = document.createElement("input");
-                    csrfInput.type = "hidden";
-                    csrfInput.name = "_csrf";
-                    csrfInput.value = csrfToken;
-                    loginForm.appendChild(csrfInput);
-
-                    // Thêm username và password
-                    const usernameInput = document.createElement("input");
-                    usernameInput.type = "text";
-                    usernameInput.name = "username";
-                    usernameInput.value = formData.username;
-                    loginForm.appendChild(usernameInput);
-
-                    const passwordInput = document.createElement("input");
-                    passwordInput.type = "password";
-                    passwordInput.name = "password";
-                    passwordInput.value = formData.password;
-                    loginForm.appendChild(passwordInput);
-
-                    // Submit form
-                    document.body.appendChild(loginForm);
-                    loginForm.submit();
-                } 
-                else {
+                    // Xử lý khi người dùng click nút
+                    if (result.isConfirmed) {
+                        performAutoLogin(formData, csrfToken);
+                    } 
+                    // Xử lý khi hết timer
+                    else if (result.dismiss === Swal.DismissReason.timer) {
+                        performAutoLogin(formData, csrfToken);
+                    }
+                    
+                } else {
+                    const result = await response.json();
                     Swal.fire({
                         icon: 'error',
-                        title: 'Registration failed!',
-                        text: 'Please check your input and try again.',
-                        showConfirmButton: false,
-                        timer: 2000
+                        title: 'Registration Failed',
+                        text: result.message || 'Please check your input and try again',
                     });
                 }
             } catch (error) {
-                console.error('Error:', error);
                 Swal.fire({
                     icon: 'error',
-                    title: 'An error occurred!',
-                    text: 'Please try again later.',
-                    showConfirmButton: false,
-                    timer: 2000
+                    title: 'Error',
+                    text: error.message || 'An unexpected error occurred',
                 });
             }
         }
+
+        // Hàm riêng để thực hiện auto login
+        function performAutoLogin(formData, csrfToken) {
+            const loginForm = document.createElement("form");
+            loginForm.method = "POST";
+            loginForm.action = "/login";
+
+            const csrfInput = document.createElement("input");
+            csrfInput.type = "hidden";
+            csrfInput.name = "_csrf";
+            csrfInput.value = csrfToken;
+            
+            const usernameInput = document.createElement("input");
+            usernameInput.type = "text";
+            usernameInput.name = "username";
+            usernameInput.value = formData.username;
+
+            const passwordInput = document.createElement("input");
+            passwordInput.type = "password";
+            passwordInput.name = "password";
+            passwordInput.value = formData.password;
+
+            loginForm.appendChild(csrfInput);
+            loginForm.appendChild(usernameInput);
+            loginForm.appendChild(passwordInput);
+
+            document.body.appendChild(loginForm);
+            loginForm.submit();
+        }
     </script>
-</head>
-<body>
-    <header>
-        <h1>Register</h1>
-    </header>
-    <main>
-        <form id="registerForm" onsubmit="createUser(event)">
-            <!-- CSRF Token -->
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-
-            <!-- Username -->
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" required>
-
-            <!-- Password -->
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required>
-            <input type="checkbox" id="showPassword" onclick="togglePasswordVisibility()"> Show Password
-
-            <!-- Phone Number -->
-            <label for="phoneNumber">Phone Number</label>
-            <input type="text" id="phoneNumber" name="phoneNumber" required>
-
-            <!-- Role -->
-            <label for="role">Role</label>
-            <input type="text" id="role" name="role" required>
-
-            <!-- Submit Button -->
-            <button type="submit">Register</button>
-        </form>
-    </main>
 </body>
 </html>

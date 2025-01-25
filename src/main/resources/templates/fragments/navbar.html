@@ -37,7 +37,7 @@
             }
 
             .main-navbar .nav-container {
-                max-width: 1200px;
+                min-width: 100%;
                 margin: 0 auto;
                 display: flex;
                 justify-content: space-between;
@@ -54,6 +54,7 @@
                 color: var(--nav-text-light);
                 transition: transform 0.3s ease;
                 margin-right: 30px;
+                
             }
 
             /* Thêm phần này để căn chỉnh icon */
@@ -67,7 +68,9 @@
             }
 
             .main-navbar .nav-content {
+                flex: 1; /* Chiếm toàn bộ không gian còn lại */
                 display: flex;
+                justify-content: center; /* Căn giữa nội dung */
                 align-items: center;
                 gap: 2rem;
             }
@@ -313,9 +316,7 @@
         <script>
             function confirmLogout(e) {
                 e.preventDefault();
-                if (confirm('Are you sure you want to logout?')) {
-                    window.location.href = '/logout';
-                }
+                window.location.href = '/home';
             }
         </script>
     </header>

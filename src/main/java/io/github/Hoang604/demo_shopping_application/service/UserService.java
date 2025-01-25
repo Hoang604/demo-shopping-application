@@ -36,7 +36,7 @@ public class UserService{
         User user = new User(
                 userDTO.username(),
                 encoder.encode(userDTO.password()),
-                userDTO.role(),
+                "USER",
                 userDTO.phoneNumber());
         return userRepository.save(user);
     }

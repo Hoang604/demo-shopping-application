@@ -143,12 +143,20 @@
                     <p>Explore our wide range of products</p>
                 </a>
 
-                <a href="/users/" class="dashboard-card card-link">
+                <a href="/users/" class="dashboard-card card-link" sec:authorize="hasRole('ADMIN')">
                     <div class="card-icon">
                         <i class="fas fa-users"></i>
                     </div>
                     <h2 class="card-title">User Management</h2>
                     <p>Manage user accounts and permissions</p>
+                </a>
+
+                <a th:href="@{'/users/' + ${userId}}" class="dashboard-card card-link" sec:authorize="hasRole('USER')">
+                    <div class="card-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h2 class="card-title">Manage your account</h2>
+                    <p>Change your password and phone number</p>
                 </a>
 
                 <a th:href="@{'/users/' + ${userId} + '/orders/'}" class="dashboard-card card-link">
