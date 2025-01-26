@@ -150,50 +150,74 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        function submitForm() {
-            var form = document.getElementById('createProductForm');
-            var formData = new FormData(form);
-            var jsonData = JSON.stringify(Object.fromEntries(formData));
-            var csrfToken = document.querySelector("input[name='_csrf']").value;
+        async function submitForm() {
+            const form = document.getElementById('createProductForm');
+            const submitButton = form.querySelector('button[type="button"]');
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            const csrfToken = data._csrf;
+            delete data._csrf; // Xóa CSRF token khỏi dữ liệu trước khi chuyển đổi thành JSON
+            const jsonData = JSON.stringify(data);
+            console.log(jsonData);
+            
+            try {
+                // Disable nút submit
+                submitButton.disabled = true;
+                submitButton.innerHTML = 'Creating...';
 
-            fetch('/products/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken
-                },
-                body: jsonData
-            }).then(response => {
-                if (response.ok) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Product Created!',
-                        text: 'Your product has been successfully created!',
-                        showConfirmButton: true,
-                        timer: 3000,
-                        timerProgressBar: true
-                    }).then(() => {
-                        window.location.href = '/products/';
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Creation Failed',
-                        text: 'Failed to create product. Please try again.',
-                        showConfirmButton: true,
-                        confirmButtonColor: '#6366f1'
-                    });
+                const response = await fetch('/products/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: jsonData
+                });
+                console.log(response.status);
+
+                const responseBody =await response.json()
+                console.log(responseBody);
+                if (!response.ok) {
+                    let errorMessage = 'Validation failed';
+                    if (typeof responseBody === 'object') {
+                        errorMessage = Object.entries(responseBody)
+                            .map(([field, msg]) => `${field}: ${msg}`)
+                            .join('\n');
+                    }
+                    throw new Error(errorMessage);
                 }
-            }).catch(error => {
-                console.error('Error:', error);
-                Swal.fire({
+
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Product Created!',
+                    text: 'Your product has been successfully created!\nname: ' + responseBody.title,
+                    showConfirmButton: true,
+                    confirmButtonText: 'View Product',
+                    showCancelButton: true,
+                    cancelButtonText: 'Close',
+                    timer: 5000,
+                    timerProgressBar: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = response.headers.get('Location');
+                    } else {
+                        form.reset();
+                    }
+                });
+
+            } catch (error) {
+                await Swal.fire({
                     icon: 'error',
-                    title: 'Oops...',
-                    text: 'An unexpected error occurred!',
+                    title: 'Creation Failed',
+                    text: error.message,
+                    showConfirmButton: true,
                     confirmButtonText: 'Try Again',
                     confirmButtonColor: '#6366f1'
                 });
-            });
+            } finally {
+                submitButton.disabled = false;
+                submitButton.innerHTML = 'Create Product';
+            }
         }
     </script>
 </body>

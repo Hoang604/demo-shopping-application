@@ -1,5 +1,6 @@
 package io.github.Hoang604.demo_shopping_application.service;
 
+import io.github.Hoang604.demo_shopping_application.dto.CreateProductDTO;
 import io.github.Hoang604.demo_shopping_application.dto.UpdateProductDTO;
 import io.github.Hoang604.demo_shopping_application.model.Category;
 import io.github.Hoang604.demo_shopping_application.model.Product;
@@ -19,7 +20,16 @@ public class ProductService {
         this.categoryService = categoryService;
     }
 
-    public Product createProduct(Product product) {
+    public Product createProduct(CreateProductDTO productDTO, Category category) {
+        Product product = new Product();
+        product.setTitle(productDTO.title());
+        product.setPrice(productDTO.price());
+        product.setDescription(productDTO.description());
+        product.setCategory(category);
+        product.setImage(productDTO.image());
+        product.setRatingRate(0.0);
+        product.setRatingCount(0);
+        
         return productRepository.save(product);
     }
 

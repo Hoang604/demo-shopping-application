@@ -13,8 +13,10 @@ function confirmDelete(userId, orderId) {
             }
         });
 }
+
 async function deleteOrder(userId, orderId) {
-    var csrfToken = document.querySelector('input[name="_csrf"]').value;
+    const csrfToken = document.querySelector('input[name="_csrf"]').value;
+    
     try {
         const response = await fetch(`/users/${userId}/orders/${orderId}`, {
             method: 'DELETE',
@@ -23,31 +25,51 @@ async function deleteOrder(userId, orderId) {
             }
         });
 
-        if (response.ok) {
-            await Swal.fire({
-                title: 'Order Deleted!',
-                text: 'The order has been deleted successfully.',
-                icon: 'success',
-                confirmButtonColor: 'var(--success)',
-                confirmButtonText: 'OK'
-            });
-            window.location.href = `/users/${userId}/orders/`;
-        } else {
-            Swal.fire({
-                title: 'Error!',
-                text: 'An error occurred while deleting the order.',
-                icon: 'error',
-                confirmButtonColor: 'var(--danger)',
-                confirmButtonText: 'OK'
-            });
+        // if status = 204, then response.json() will throw an error, set responseBody to null
+        const responseBody = response.status !== 204 ? await response.json() : null;
+
+        switch (response.status) {
+            case 204:
+                await Swal.fire({
+                    title: 'Deleted!',
+                    text: 'Order deleted successfully',
+                    icon: 'success',
+                    confirmButtonColor: 'var(--success)',
+                    timer: 2000,
+                    timerProgressBar: true
+                });
+                window.location.href = `/users/${userId}/orders/`; // Redirect về danh sách
+                break;
+
+            case 403:
+                await Swal.fire({
+                    title: 'Access Denied!',
+                    text: responseBody.error,
+                    icon: 'warning',
+                    confirmButtonColor: 'var(--primary)'
+                });
+                break;
+
+            case 404:
+                await Swal.fire({
+                    title: 'Not Found!',
+                    text: responseBody.error,
+                    icon: 'error',
+                    confirmButtonColor: 'var(--danger)'
+                });
+                window.location.href = `/users/${userId}/orders/`; // Redirect về danh sách
+                break;
+
+            default:
+                throw new Error(responseBody?.error || `HTTP error! status: ${response.status}`);
         }
+
     } catch (error) {
-        Swal.fire({
+        await Swal.fire({
             title: 'Error!',
-            text: error.message + `/users/${userId}/orders/${orderId}`,
+            text: error.message,
             icon: 'error',
-            confirmButtonColor: 'var(--danger)',
-            confirmButtonText: 'OK'
+            confirmButtonColor: 'var(--danger)'
         });
     }
 }

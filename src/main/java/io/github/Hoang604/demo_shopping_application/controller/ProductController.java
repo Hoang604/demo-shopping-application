@@ -7,15 +7,24 @@ import io.github.Hoang604.demo_shopping_application.model.Category;
 import io.github.Hoang604.demo_shopping_application.model.MyUserDetails;
 import io.github.Hoang604.demo_shopping_application.model.Product;
 import io.github.Hoang604.demo_shopping_application.service.ProductService;
+import io.github.Hoang604.demo_shopping_application.utils.SecurityUtils;
+import jakarta.validation.Valid;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+
+import java.net.URI;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/products")
@@ -41,28 +50,50 @@ public class ProductController {
         List<Category> categories = categoryService.getAllCategories();
         model.addAttribute("categories", categories);
 
-        MyUserDetails userDetails = (MyUserDetails) authentication.getPrincipal();
-        model.addAttribute("userId", userDetails.getId());
+        Integer userId = SecurityUtils.getCurrentUserId(authentication);
+        model.addAttribute("userId", userId);
         return "product/products";
     }
 
+    @ResponseBody
+    @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> createProduct(
+        @Valid @RequestBody CreateProductDTO productDTO,
+            BindingResult bindingResult, Authentication authentication) {
 
-    @PostMapping(value = "/", consumes = "application/json")
-    public String createProduct(@RequestBody CreateProductDTO product, Model model) {
-        Product newProduct = new Product();
-        newProduct.setTitle(product.title());
-        newProduct.setPrice(product.price());
-        newProduct.setDescription(product.description());
-        Category category = categoryService.getCategoryById(product.categoryId());
-        newProduct.setCategory(category);
-        newProduct.setRatingRate(0.0);
-        newProduct.setRatingCount(0);
-        newProduct.setImage(product.image());
-        System.out.println("newProduct: " + newProduct);
-        productService.createProduct(newProduct);
-        model.addAttribute("product", newProduct);
-        model.addAttribute("message", "Product created successfully");
-        return "product/product";
+        // authentication check
+        if (!SecurityUtils.isAdmin(authentication)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Map.of("error", "Access denied"));
+        }
+        
+        // validation errors
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = bindingResult.getFieldErrors().stream()
+                .collect(Collectors.toMap(
+                    FieldError::getField,
+                    FieldError::getDefaultMessage,
+                    (existing, replacement) -> existing + ", " + replacement
+                ));
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+        try {
+            // Kiểm tra category
+            Category category = categoryService.getCategoryById(productDTO.categoryId());
+            if (category == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "Category not found"));
+            }
+            // Tạo product
+            Product newProduct = productService.createProduct(productDTO, category);
+
+            return ResponseEntity.created(URI.create("/products/" + newProduct.getId()))
+                .body(newProduct);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                .body(Map.of("error", "Failed to create product: " + e.getMessage()));
+        }
     }
 
     @GetMapping("/{id}")

@@ -57,7 +57,7 @@ public class OrderController {
                                 .body(Map.of("error", "Access denied"));
         }
 
-        try {            
+        try {
             Order newOrder = orderService.saveOrder(order);
             
             Map<String, Object> response = new HashMap<>();
@@ -91,9 +91,30 @@ public class OrderController {
         return "order/order";
     }
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseBody
     @DeleteMapping("/{id}")
-    public void deleteOrderById(@PathVariable int id) {
-        orderService.deleteOrderById(id);
+    public ResponseEntity<Map<String, String>> deleteOrderById(
+        @PathVariable int id, Authentication authentication) {
+        
+        try {
+            if (orderService.getOrderById(id) == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "Order not found with id: " + id));
+            }
+            
+            // Kiểm tra quyền sở hữu
+            if (orderService.getOrderById(id).getUser().getId() != SecurityUtils.getCurrentUserId(authentication)
+                && !SecurityUtils.isAdmin(authentication)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "You are not authorized to delete this order"));
+            }
+
+            orderService.deleteOrderById(id);
+            return ResponseEntity.noContent().build();
+
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                .body(Map.of("error", "Failed to delete order: " + e.getMessage()));
+        }
     }
 }
