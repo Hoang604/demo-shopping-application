@@ -7,6 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <html xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
     <style>
         :root {
             --primary-color: #2c3e50;
@@ -38,31 +39,6 @@
             margin-right: 5%;
             padding: 2rem 1rem;
             flex: 1;
-        }
-
-        .h1container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding-top: 0;
-            padding-bottom: 1.2rem;
-            flex: 1;
-        }
-
-        header {
-            text-align: center;
-            margin-top: 0;
-            padding: 1rem 0;
-            background: linear-gradient(135deg, var(--primary-color), #34495e);
-            color: white;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            padding: 0;
-            margin: 0;
-            font-weight: 600;
-            letter-spacing: -0.5px;
         }
 
         .filter-bar {
@@ -233,10 +209,8 @@
 </head>
 <body>
     <th:block th:replace="fragments/navbar :: navbar"></th:block>
-    <header>
-        <div class="h1container">
+    <header class="header">
             <h1>Product Management</h1>
-        </div>  
         <div th:if="${category != null}">
             <h2 th:text="${category.name}" style="font-weight: 500; font-size: 1.5rem;"></h2>
         </div>

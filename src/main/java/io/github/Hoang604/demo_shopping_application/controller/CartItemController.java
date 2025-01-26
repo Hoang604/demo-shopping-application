@@ -2,8 +2,9 @@ package io.github.Hoang604.demo_shopping_application.controller;
 
 import io.github.Hoang604.demo_shopping_application.dto.CreateCartItemDTO;
 import io.github.Hoang604.demo_shopping_application.model.CartItem;
-import io.github.Hoang604.demo_shopping_application.model.MyUserDetails;
 import io.github.Hoang604.demo_shopping_application.service.CartItemService;
+import io.github.Hoang604.demo_shopping_application.utils.SecurityUtils;
+
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -31,13 +33,14 @@ public class CartItemController {
     @GetMapping("/")
     public String getCart(Model model, Authentication authentication) {
         List<CartItem> cartItems;
-        if (isAdmin(authentication)) {
+        Integer userId = SecurityUtils.getCurrentUserId(authentication);
+        if (SecurityUtils.isAdmin(authentication)) {
             cartItems = cartItemService.getAllCartItems();
         }
         else {
-            cartItems = cartItemService.getCartItemByUserId(getCurrentUserId(authentication));
+            cartItems = cartItemService.getCartItemByUserId(userId);
         }
-        model.addAttribute("userId", getCurrentUserId(authentication));
+        model.addAttribute("userId", userId);
         model.addAttribute("cartItems", cartItems);
         return "cart/cart";
     }
@@ -46,10 +49,11 @@ public class CartItemController {
     @PostMapping("/")
     @ResponseBody
     public ResponseEntity<?> createCartItem(@RequestBody CreateCartItemDTO cartItemDTO,
-                                            Authentication authentication) {
+                Authentication authentication) {
         try {
             // Kiểm tra userId có khớp với current user không (trừ admin)
-            if (!isAdmin(authentication) && !cartItemDTO.userId().equals(getCurrentUserId(authentication))) {
+            if (!SecurityUtils.isAdmin(authentication) && !cartItemDTO.userId()
+                    .equals(SecurityUtils.getCurrentUserId(authentication))) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
 
@@ -57,7 +61,9 @@ public class CartItemController {
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Item added to cart successfully");
             response.put("cartItem", newCartItem);
-            return ResponseEntity.ok(response);
+            return ResponseEntity.created(URI.create("/users/" +
+                    SecurityUtils.getCurrentUserId(authentication) + "/cart/"
+                    + newCartItem.getId())).body(response);
             
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Collections.singletonMap("error", e.getMessage()));
@@ -68,28 +74,31 @@ public class CartItemController {
     @GetMapping("/{id}")
     public String getCartItemById(@PathVariable int id, Model model, Authentication authentication) {
         CartItem cartItem = cartItemService.getCartItemById(id);
+        if (cartItem.getUser().getId() != SecurityUtils.getCurrentUserId(authentication)
+                && !SecurityUtils.isAdmin(authentication)) {
+            return "error/403";
+        }
         model.addAttribute("cartItem", cartItem);
-        MyUserDetails userDetails = (MyUserDetails) authentication.getPrincipal();
-        model.addAttribute("userId", userDetails.getId());
+        model.addAttribute("userId", SecurityUtils.getCurrentUserId(authentication));
         return "cart/cart-item";
     }
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseBody
     @DeleteMapping("/{id}")
-    public String deleteCartItemById(@PathVariable int id, Model model) {
-        if (cartItemService.getCartItemById(id) == null) {
-            return "error/404";
+    public ResponseEntity<Void> deleteCartItemById( @PathVariable int id, Authentication authentication) {
+        
+        CartItem cartItem = cartItemService.getCartItemById(id);
+        
+        if (cartItem == null) {
+            return ResponseEntity.notFound().build();
         }
+        
+        if (cartItem.getUser().getId() != SecurityUtils.getCurrentUserId(authentication)
+                && !SecurityUtils.isAdmin(authentication)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        
         cartItemService.deleteCartItemById(id);
-        return "redirect:/users/{userId}/cart";
-    }
-    private boolean isAdmin(Authentication authentication) {
-        return authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-    }
-    // Lấy ID của User hiện tại
-    private Integer getCurrentUserId(Authentication authentication) {
-        MyUserDetails userDetails = (MyUserDetails)authentication.getPrincipal();
-        return userDetails.getId();
+        return ResponseEntity.noContent().build();
     }
 }
