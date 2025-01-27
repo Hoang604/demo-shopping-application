@@ -29,8 +29,12 @@ public class ProductService {
         product.setImage(productDTO.image());
         product.setRatingRate(0.0);
         product.setRatingCount(0);
-        
+
         return productRepository.save(product);
+    }
+    
+    public List<Product> getRandomProducts(int count) {
+        return productRepository.findRandomProducts(count);
     }
 
     public Product getProductById(int id) {

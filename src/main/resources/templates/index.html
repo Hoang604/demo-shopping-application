@@ -6,6 +6,8 @@
     <title>Shopping Application</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <style>
         :root {
             --primary-color: #2c3e50;
@@ -42,8 +44,8 @@
         }
 
         .hero-title {
+            margin: 0;
             font-size: 3.5rem;
-            margin-bottom: 1.5rem;
             color: var(--primary-color);
             font-weight: 700;
             letter-spacing: -1px;
@@ -94,22 +96,308 @@
             color: inherit;
             display: block;
         }
+        .product-carousel {
+            margin: 2rem 0;
+            padding: 0 1rem;
+            position: relative;
+        }
+
+        .swiper-container {
+            width: 100%;
+            height: 280px;
+            overflow: hidden;
+            padding: 10px 0;
+        }
+
+        .swiper-wrapper {
+            width: auto !important; /* Cho phép Swiper tính toán width */
+        }
+
+        .swiper-slide {
+            width: 300px !important; /* Đặt width cố định cho slide */
+            height: 250px;
+            margin-right: 15px !important; /* Khoảng cách giữa các slide */
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            flex-shrink: 0; /* Ngăn slide co lại */
+        }
+
+        .swiper-slide:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .slide-content {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 150px; /* Giảm chiều cao ảnh */
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .product-title {
+            font-size: 0.95rem;
+            margin: 5px 0;
+            color: var(--primary-color);
+            flex-grow: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .swiper-button-next,
+        .swiper-button-prev {
+            width: 30px !important;
+            height: 30px !important;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .swiper-button-next::after,
+        .swiper-button-prev::after {
+            font-size: 1rem !important;
+            color: var(--secondary-color);
+        }
+
+        .swiper-pagination {
+            bottom: 5px !important;
+        }
 
         footer {
             background: var(--primary-color);
             color: white;
-            text-align: center;
-            padding: 1.5rem;
+            padding: 2rem 0;
             margin-top: auto;
         }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: white;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .footer-section p,
+        .footer-section ul {
+            font-size: 0.9rem;
+            color: #ddd;
+            line-height: 1.6;
+        }
+
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-section li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: #ddd;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            display: block; /* Make links block for better click area */
+        }
+
+        .footer-section a:hover {
+            color: white;
+        }
+
+        .social-links a {
+            display: inline-block;
+            margin-right: 10px;
+            font-size: 1.3rem;
+            color: white;
+            transition: transform 0.3s ease;
+        }
+
+        .social-links a:hover {
+            transform: translateY(-3px);
+        }
+
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 1rem;
+            border-top: 1px solid #444;
+            font-size: 0.85rem;
+            color: #ccc;
+        }
+
+                /* Featured Sections */
+        .featured-sections {
+            padding: 3rem 0;
+            background-color: var(--light-gray);
+        }
+
+        .featured-sections .container {
+            display: flex;
+            flex-direction: column;
+            gap: 3rem; /* Khoảng cách giữa các section con */
+        }
+
+        .featured-categories h2,
+        .promotional-banner h2 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        /* Category Grid */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Điều chỉnh minmax cho phù hợp */
+            gap: 1.5rem;
+            padding: 0 1rem; /* Để căn chỉnh với container */
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: var(--transition);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+            text-decoration: none;
+            color: inherit;
+            display: block; /* Để thẻ 'a' lấp đầy category-card */
+        }
+
+        .category-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .category-icon {
+            font-size: 2rem;
+            color: var(--secondary-color);
+            margin-bottom: 0.75rem;
+        }
+
+        .category-title {
+            font-size: 1rem;
+            margin: 0;
+            color: var(--primary-color);
+        }
+
+        /* Promotional Banner */
+        .promotional-banner {
+            background: var(--secondary-color); /* Màu banner nổi bật */
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .promotional-banner .banner-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .promotional-banner h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .promotional-banner p {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.9;
+        }
+
+        .banner-button {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background-color: white;
+            color: var(--secondary-color);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .banner-button:hover {
+            background-color: var(--light-gray);
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            .featured-sections .container {
+                gap: 2rem; /* Giảm khoảng cách trên mobile */
+            }
+
+            .featured-categories h2,
+            .promotional-banner h2 {
+                font-size: 1.75rem; /* Giảm kích thước heading trên mobile */
+            }
+
+            .category-grid {
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* Card danh mục nhỏ hơn trên mobile */
+            }
+
+            .promotional-banner {
+                padding: 1.5rem; /* Padding banner nhỏ hơn trên mobile */
+            }
+
+            .promotional-banner h2 {
+                font-size: 1.6rem; /* Giảm kích thước heading banner trên mobile */
+            }
+            .promotional-banner p {
+                font-size: 1rem; /* Giảm kích thước paragraph banner trên mobile */
+            }
+        }
+
 
         @media (max-width: 768px) {
             .hero-title {
                 font-size: 2.5rem;
             }
-            
+
             .dashboard-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .footer-container {
+                grid-template-columns: 1fr; /* Stack sections on smaller screens */
+            }
+
+            .footer-section {
+                text-align: center; /* Center align text in sections on smaller screens */
+            }
+
+            .footer-section h3,
+            .footer-section p,
+            .footer-section ul {
+                text-align: left; /* Revert text alignment within sections if needed */
             }
         }
     </style>
@@ -125,7 +413,25 @@
                 </p>
             </section>
 
-            <div class="dashboard-grid">
+            <!-- Product Carousel Section -->
+            <section class="product-carousel" sec:authorize="hasRole('USER')">
+                <div class="swiper-container">
+                    <div class="swiper-wrapper">
+                        <div th:each="product : ${randomProducts}" class="swiper-slide" th:onclick="'window.location.href=\'' + @{/products/{id}(id=${product.id})} + '\''">
+                            <div class="slide-content">
+                                <img th:src="${product.image}" alt="Product Image" class="product-image" />
+                                <h3 class="product-title" th:text="${product.title}"></h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-pagination"></div>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                </div>
+            </section>
+
+
+            <div class="dashboard-grid" sec:authorize="hasRole('ADMIN')">
                 <a href="/products/" class="dashboard-card card-link">
                     <div class="card-icon">
                         <i class="fas fa-shopping-bag"></i>
@@ -134,20 +440,12 @@
                     <p>Explore our wide range of products</p>
                 </a>
 
-                <a href="/users/" class="dashboard-card card-link" sec:authorize="hasRole('ADMIN')">
+                <a href="/users/" class="dashboard-card card-link">
                     <div class="card-icon">
                         <i class="fas fa-users"></i>
                     </div>
                     <h2 class="card-title">User Management</h2>
                     <p>Manage user accounts and permissions</p>
-                </a>
-
-                <a th:href="@{'/users/' + ${userId}}" class="dashboard-card card-link" sec:authorize="hasRole('USER')">
-                    <div class="card-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <h2 class="card-title">Manage your account</h2>
-                    <p>Change your password and phone number</p>
                 </a>
 
                 <a th:href="@{'/users/' + ${userId} + '/orders/'}" class="dashboard-card card-link">
@@ -169,8 +467,70 @@
         </div>
     </main>
 
+    <section class="featured-sections" sec:authorize="hasRole('USER')">
+        <div class="container">
+            <div class="featured-categories">
+                <h2>Featured Categories</h2>
+                <div class="category-grid">
+                    <a href="/products/?categoryId=3" class="category-card">
+                        <i class="fas fa-tshirt category-icon"></i>
+                        <h3 class="category-title">Fashion</h3>
+                    </a>
+                    <a href="/products/?categoryId=1" class="category-card">
+                        <i class="fas fa-mobile-alt category-icon"></i>
+                        <h3 class="category-title">Electronics</h3>
+                    </a>
+                    <a href="/products/?categoryId=4" class="category-card">
+                        <i class="fas fa-home category-icon"></i>
+                        <h3 class="category-title">Home & Kitchen</h3>
+                    </a>
+                    <a href="/products/?categoryId=2" class="category-card">
+                        <i class="fas fa-book category-icon"></i>
+                        <h3 class="category-title">Books</h3>
+                    </a>
+                </div>
+            </div>
+
+            <div class="promotional-banner">
+                <div class="banner-content">
+                    <h2>🔥 Hot Deals New Year! 🔥</h2>
+                    <p>Get up to 50% off on selected items. Limited time offer!</p>
+                    <a href="/products/?categoryId=3" class="banner-button">Shop Now</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <footer>
-        <p>&copy; 2025 Shopping Application. All rights reserved.</p>
+        <div class="footer-container">
+            <div class="footer-section about-us">
+                <h3>About Us</h3>
+                <p>Your go-to destination for online shopping. We offer a wide range of products 
+                    from fashion to electronics, ensuring a seamless shopping experience.</p>
+            </div>
+            <div class="footer-section quick-links">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="/home">Home</a></li>
+                    <li><a href="/products/">Products</a></li>
+                    <li><a th:href="@{'/users/' + ${userId} + '/cart/'}">Cart</a></li>
+                    <li><a th:href="@{'/users/' + ${userId} + '/orders/'}">Orders</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="footer-section social">
+                <h3>Follow Us</h3>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-square"></i></a>
+                    <a href="#"><i class="fab fa-twitter-square"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 Shopping Application. All rights reserved.</p>
+        </div>
     </footer>
 
     <!-- Hidden logout form -->
@@ -196,6 +556,59 @@
                 }
             });
         }
+        document.addEventListener('DOMContentLoaded', function () {
+            const swiper = new Swiper('.swiper-container', {
+                loop: true,
+                slidesPerView: 'auto', // Sử dụng 'auto' thay vì số cố định
+                loopAdditionalSlides: 2, // Thêm slide ảo để loop mượt
+                loopedSlides: 3, // Số slide thật cần loop
+                centeredSlides: false,
+                freeMode: false,
+                simulateTouch: true, // Cho phép kéo bằng chuột
+                grabCursor: true, // Hiển thị icon tay khi hover
+                touchRatio: 1, // Độ nhạy cảm ứng
+
+                // Thêm cấu hình mousewheel cho touchpad
+                mousewheel: {
+                    forceToAxis: true, // Chỉ scroll theo trục ngang
+                    invert: false, // Đảo ngược hướng scroll
+                    sensitivity: 0.8, // Độ nhạy
+                    eventsTarget: '.swiper-container' // Element nhận event
+                },
+
+                autoplay: {
+                    delay: 3000, // 3 giây
+                    disableOnInteraction: false, // tiếp tục autoplay sau khi tương tác
+                },
+
+                breakpoints: {
+                    320: {
+                        slidesPerView: 1.2, // Hiển thị 1 slide + 20% của slide tiếp theo
+                        spaceBetween: 10,
+                        centeredSlides: true
+                    },
+                    640: {
+                        slidesPerView: 2.3,
+                        spaceBetween: 15,
+                        centeredSlides: false
+                    },
+                    1024: {
+                        slidesPerView: 3.2,
+                        spaceBetween: 20
+                    }
+                },
+
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                    dynamicBullets: true // Tự động điều chỉnh số lượng pagination
+                },
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                }
+            });
+        });
     </script>
 </body>
 </html>
