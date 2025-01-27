@@ -94,17 +94,16 @@
 
         .btn-primary {
             background: var(--secondary-color);
+            border-color: var(--secondary-color);
             color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.55rem;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
         }
-
-        .btn-danger {
-            background: var(--danger-color);
-            color: white;
-        }
-
-        .btn-secondary {
-            background: var(--light-gray);
-            color: var(--text-color);
+        .btn-primary:hover {
+            opacity: 0.9;
+            background: var(--primary-color);
         }
 
         .btn:hover {
@@ -119,10 +118,71 @@
             color: var(--secondary-color);
             font-weight: 500;
         }
+        .back-link:hover {
+            text-decoration: underline;
+        }
 
         .role-badge {
             display: inline-block;
             padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .role-admin {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .role-user {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .input-field {
+            width: 100%;
+            padding: 0.875rem 1.25rem;
+            border: 2px solid #cbd5e1;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        .user-info {
+            display: grid;
+            gap: 1.5rem;
+            padding: 1.5rem 0;
+        }
+
+        .info-group {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: var(--light-gray);
+            border-radius: 8px;
+            gap: 1rem;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--primary-color);
+            min-width: 120px;
+            padding-right: 1rem;
+            border-right: 2px solid #ddd;
+        }
+
+        .info-value {
+            color: var(--text-color);
+            flex-grow: 1;
+        }
+
+        .highlight {
+            color: var(--secondary-color);
+            font-weight: 500;
+        }
+
+        .role-badge {
+            padding: 0.25rem 1rem;
             border-radius: 20px;
             font-size: 0.85rem;
             font-weight: 500;
@@ -210,60 +270,44 @@
 
     <main class="container">
         <div class="profile-card">
-            <form id="updateForm">
-                <input type="hidden" name="_csrf" th:value="${_csrf.token}">
-
-                <div class="form-group">
-                    <label class="form-label">User ID</label>
-                    <input type="text" class="form-input" th:value="${user.id}" readonly>
+            <div class="user-info">
+                <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                <div class="info-group">
+                    <span class="info-label">User ID</span>
+                    <span class="info-value" th:text="${user.id}"></span>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Username</label>
-                    <input type="text" name="username" class="form-input" 
-                           th:value="${user.username}" required>
+                <div class="info-group">
+                    <span class="info-label">Username</span>
+                    <span class="info-value highlight" th:text="${user.username}"></span>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Password</label>
-                    <input type="password" name="password" class="form-input" 
-                           th:value="${user.password}" required>
+                <div class="info-group">
+                    <span class="info-label">Phone Number</span>
+                    <span class="info-value" th:text="${user.phoneNumber ?: 'N/A'}"></span>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Phone Number</label>
-                    <input type="tel" name="phoneNumber" class="form-input"
-                           th:value="${user.phoneNumber}" required>
+                <div class="info-group" sec:authorize="hasRole('ADMIN')">
+                    <span class="info-label">Role</span>
+                    <span class="role-badge" 
+                          th:classappend="${user.role == 'ADMIN'} ? 'role-admin' : 'role-user'"
+                          th:text="${user.role}"></span>
                 </div>
+            </div>
 
-                <div class="form-group">
-                    <label class="form-label">Phone Number</label>
-                    <input type="tel" name="role" class="form-input"
-                           th:value="${user.role}" required>
-                </div>
-
-                <div class="button-group">
-                    <button type="button" class="btn btn-primary" 
-                            th:onclick="'updateUser(' + ${user.id} + ')'">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path>
-                            <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon>
-                        </svg>
-                        Update Profile
-                    </button>
-                    
-                    <button type="button" class="btn btn-danger" 
-                            th:onclick="'confirmDelete(' + ${user.id} + ')'">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                        </svg>
-                        Delete Account
-                    </button>
+            <div class="button-group btn-primary">
+                <a th:onclick="'verifyPasswordBeforeEdit(event, ' + ${user.id} + ')'">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path>
+                        <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon>
+                    </svg>
+                    Edit Profile
+                </a>
                 </div>
             </form>
 
             <div class="action-links">
-                <a href="/api/users" class="back-link">
+                <a href="/users/" class="back-link" sec:authorize="hasRole('ADMIN')">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M19 12H5M12 19l-7-7 7-7"/>
                     </svg>
@@ -274,104 +318,59 @@
     </main>
 
     <script>
-        async function updateUser(userId) {
-            const form = document.getElementById('updateForm');
-            const formData = new FormData(form);
-            const csrfToken = form.querySelector('input[name="_csrf"]').value;
-            const jsonData = JSON.stringify(Object.fromEntries(formData));
-            
-            try {
-                const response = await fetch('/users/' + userId, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken
-                    },
-                    body: jsonData
-                });
+        async function verifyPasswordBeforeEdit(event, userId) {
+            event.preventDefault();
 
-                if (response.ok) {
-                    await Swal.fire({
-                        title: 'Success!',
-                        text: 'User updated successfully',
-                        icon: 'success',
-                        confirmButtonColor: 'var(--secondary-color)'
-                    });
-                    window.location.reload();
-                } else {
-                    const error = await response.json();
-                    throw new Error(error.message || 'Failed to update user');
-                }
-            } catch (error) {
-                Swal.fire({
-                    title: 'Error!',
-                    text: error.message,
-                    icon: 'error',
-                    confirmButtonColor: 'var(--danger-color)'
-                });
-            }
-        }
-
-        function confirmDelete(userId) {
-            Swal.fire({
-                title: 'Delete User Account?',
-                text: "This action cannot be undone!",
-                icon: 'warning',
+            const { value: password } = await Swal.fire({
+                title: 'Password Verification',
+                input: 'password',
+                inputLabel: 'Enter your password to continue',
+                inputPlaceholder: 'Your password',
                 showCancelButton: true,
-                confirmButtonColor: 'var(--danger-color)',
-                cancelButtonColor: 'var(--primary-color)',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    deleteUser(userId);
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'Please enter your password!';
+                    }
                 }
             });
-        }
 
-        async function deleteUser(userId) {
-            const csrfToken = document.querySelector('input[name="_csrf"]').value;
-            
-            try {
-                const response = await fetch('/users/' + userId, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken
+            if (password) {
+                try {
+                    const csrfToken = document.querySelector('input[name="_csrf"]').value;
+                    const requestBody = {
+                        id: userId,
+                        password: password
                     }
-                });
-
-                if (response.ok) {
-                    await Swal.fire({
-                        title: 'Deleted!',
-                        text: 'User has been deleted',
-                        icon: 'success',
-                        confirmButtonColor: 'var(--secondary-color)'
+                    const response = await fetch('/api/verify-password', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: JSON.stringify(requestBody)
                     });
-                    window.location.href = '/users';
-                } else {
-                    const error = await response.json();
-                    throw new Error(error.message || 'Failed to delete user');
+
+                    if (response.ok) {
+                        window.location.href = `/users/${userId}/update?password=${password}`;
+                    } else {
+                        const error = await response.json();
+                        await Swal.fire({
+                            icon: 'error',
+                            title: 'Authentication Failed',
+                            text: error.message || 'Incorrect password!'
+                        });
+                    }
+                } catch (error) {
+                    await Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: error.message || 'Failed to verify password'
+                    });
                 }
-            } catch (error) {
-                Swal.fire({
-                    title: 'Error!',
-                    text: error.message,
-                    icon: 'error',
-                    confirmButtonColor: 'var(--danger-color)'
-                });
             }
         }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const message = /*[[${message}]]*/ null;
-            if (message) {
-                Swal.fire({
-                    title: 'Success!',
-                    text: message,
-                    icon: 'success',
-                    confirmButtonColor: 'var(--secondary-color)'
-                });
-            }
-        });
     </script>
 </body>
 </html>

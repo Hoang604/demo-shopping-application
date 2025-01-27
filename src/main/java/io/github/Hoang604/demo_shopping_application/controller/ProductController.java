@@ -4,7 +4,6 @@ import io.github.Hoang604.demo_shopping_application.service.CategoryService;
 import io.github.Hoang604.demo_shopping_application.dto.UpdateProductDTO;
 import io.github.Hoang604.demo_shopping_application.dto.CreateProductDTO;
 import io.github.Hoang604.demo_shopping_application.model.Category;
-import io.github.Hoang604.demo_shopping_application.model.MyUserDetails;
 import io.github.Hoang604.demo_shopping_application.model.Product;
 import io.github.Hoang604.demo_shopping_application.service.ProductService;
 import io.github.Hoang604.demo_shopping_application.utils.SecurityUtils;
@@ -98,44 +97,79 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public String getProductById(@PathVariable int id, Model model, Authentication authentication) {
+        if (authentication == null) {
+            return "error/401"; // Trả về trang lỗi nếu chưa đăng nhập
+        }
         Product product = productService.getProductById(id);
         if (product == null) {
             return "error/404"; // Trả về trang lỗi nếu sản phẩm không tồn tại
         }
         model.addAttribute("product", product);
-        MyUserDetails userDetails = (MyUserDetails) authentication.getPrincipal();
-        model.addAttribute("userId", userDetails.getId());
+        model.addAttribute("userId", SecurityUtils.getCurrentUserId(authentication));
         return "product/product";
     }
 
-    @PutMapping("/{id}")
-    public String updateProduct(@PathVariable int id, @RequestBody UpdateProductDTO productDTO, Model model) {
+    @ResponseBody
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updateProduct(@PathVariable int id, @Valid @RequestBody UpdateProductDTO productDTO,
+            Authentication authentication, BindingResult bindingResult) {
+        if (!SecurityUtils.isAdmin(authentication)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = bindingResult.getFieldErrors().stream()
+                    .collect(Collectors.toMap(
+                            FieldError::getField,
+                            FieldError::getDefaultMessage,
+                            (existing, replacement) -> existing + ", " + replacement));
+            return ResponseEntity.badRequest().body(errors);
+        }
+        
         Product updatedProduct = productService.updateProduct(id, productDTO);
         if (updatedProduct == null) {
-            return "error/product-not-exist";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Product not found"));
         }
-        model.addAttribute("product", updatedProduct);
-        model.addAttribute("message", "Product updated successfully");
-        return "product/product";
+        return ResponseEntity.ok(updatedProduct);
     }
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseBody
     @DeleteMapping("/{id}")
-    public String deleteProductById(@PathVariable int id, Model model) {
-        if (productService.getProductById(id) == null) {
-            return "error/404";
+    public ResponseEntity<?> deleteProductById(@PathVariable int id, Authentication authentication) {
+        if (!SecurityUtils.isAdmin(authentication)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        productService.deleteProductById(id);
-        model.addAttribute("message", "Product deleted successfully");
-        return "redirect:/product/products"; // Redirect to the products list page
-    }
+        Product product = productService.getProductById(id);
+        if (product == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("message", "Product not found"));
+        }
 
+        productService.deleteProductById(id);
+        return ResponseEntity.noContent().build();
+    }
+    
     @GetMapping("/new")
     public String showCreateProductForm(Model model) {
         List<Category> categories = categoryService.getAllCategories();
         model.addAttribute("categories", categories);
-        model.addAttribute("product", new Product());
         return "product/create-product";
+    }
+
+    @GetMapping("/{id}/edit")
+    public String showUpdateProductForm(@PathVariable int id, Model model, Authentication authentication) {
+        if (!SecurityUtils.isAdmin(authentication)) {
+            return "error/403";
+        }
+        Product product = productService.getProductById(id);
+        if (product == null) {
+            return "error/404";
+        }
+        List<Category> categories = categoryService.getAllCategories();
+        model.addAttribute("product", product);
+        model.addAttribute("categories", categories);
+        return "product/update-product";
     }
 
     @GetMapping("/search/")

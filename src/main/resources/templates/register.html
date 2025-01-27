@@ -240,13 +240,7 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'Registration Failed',
-                    html: `<div class="text-left">
-                        <p>${error.message}</p>
-                        ${error.response ? 
-                            `<pre class="text-xs mt-2">${JSON.stringify(error.response, null, 2)}</pre>` 
-                            : ''
-                        }
-                    </div>`,
+                    text: error.message,
                     confirmButtonColor: 'var(--primary-color)',
                     confirmButtonText: 'Try Again'
                 });

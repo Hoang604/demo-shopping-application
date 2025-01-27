@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${user.username} + ' Profile'">User Information</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --light-gray: #ecf0f1;
+            --text-color: #2c3e50;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: #f8f9fa;
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            flex: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem 0;
+            background: linear-gradient(135deg, var(--primary-color), #34495e);
+            color: white;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid var(--light-gray);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--light-gray);
+            color: var(--text-color);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 2rem;
+            text-decoration: none;
+            color: var(--secondary-color);
+            font-weight: 500;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.875rem 1.25rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--primary-color);
+            color: white !important;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: var(--transition);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .back-button:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .back-button svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .back-button {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+            
+            .back-button svg {
+                width: 18px;
+                height: 18px;
+            }
+            .container {
+                padding: 1rem;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/home" class="back-button" sec:authorize="hasRole('USER')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 18l-6-6 6-6"/>
+        </svg>
+        Back to Home
+    </a>
+    <a href="/users/" class="back-button" sec:authorize="hasRole('ADMIN')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 18l-6-6 6-6"/>
+        </svg>
+        Back to Users List
+    </a>
+    <header>
+        <div class="container">
+            <h1>User Profile</h1>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="profile-card">
+            <form id="updateForm">
+                <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="password" name="password" class="form-input"
+                        th:value="${password}" required>
+                    <input type="checkbox" id="showPassword" onclick="togglePasswordVisibility()"> Show Password
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="tel" name="phoneNumber" class="form-input"
+                           th:value="${user.phoneNumber}" required>
+                </div>
+
+                <div class="form-group" sec:authorize="hasRole('ADMIN')">
+                    <label for="role" class="form-label">Role</label>
+                        <select id="role" 
+                                name="role" 
+                                class="input-field" 
+                                required>
+                            <option value="USER">User</option>
+                            <option value="ADMIN">Admin</option>
+                        </select>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn btn-primary" 
+                            th:onclick="'updateUser(' + ${user.id} + ')'">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path>
+                            <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon>
+                        </svg>
+                        Update Profile
+                    </button>
+                    
+                    <button type="button" class="btn btn-danger" 
+                            th:onclick="'confirmDelete(' + ${user.id} + ')'">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                        Delete Account
+                    </button>
+                </div>
+            </form>
+
+            <div class="action-links">
+                <a href="/users/" class="back-link" sec:authorize="hasRole('ADMIN')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Back to Users List
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function togglePasswordVisibility() {
+            const passwordField = document.getElementById('password');
+            const showPasswordCheckbox = document.getElementById('showPassword');
+            if (showPasswordCheckbox.checked) {
+                passwordField.type = 'text';
+            } else {
+                passwordField.type = 'password';
+            }
+        }
+
+        async function updateUser(userId) {
+            const form = document.getElementById('updateForm');
+            const formData = new FormData(form);
+            const csrfToken = form.querySelector('input[name="_csrf"]').value;
+            
+            // Convert FormData to object and handle data types
+            const rawData = Object.fromEntries(formData);
+            const jsonData = JSON.stringify({
+                ...rawData,
+                // Convert specific fields (example for boolean field)
+                active: rawData.active === 'true'
+            });
+
+            try {
+                const response = await fetch(`/users/${userId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: jsonData
+                });
+
+                const contentType = response.headers.get('content-type');
+                const data = contentType?.includes('application/json') 
+                    ? await response.json() 
+                    : null;
+
+                if (!response.ok) {
+                    const error = (data && data.message) || `HTTP error! status: ${response.status}`;
+                    throw new Error(error);
+                }
+
+                const result = await Swal.fire({
+                    title: 'Success!',
+                    text: 'User updated successfully',
+                    icon: 'success',
+                    confirmButtonColor: 'var(--secondary-color)',
+                    cancelButtonColor: 'var(--primary-color)',
+                    showCancelButton: true,
+                    cancelButtonText: 'Back to home',
+                    showConfirmButton: true,
+                    confirmButtonText: 'View User',
+                    timer: 3000,
+                    timerProgressBar: true
+                    
+                });
+                if (result.isConfirmed) {
+                     window.location.reload();
+                } else {
+                    window.location.href = '/home';
+                }
+            } catch (error) {
+                const errorMessage = error.message || 'Failed to update user';
+                Swal.fire({
+                    title: 'Error!',
+                    text: errorMessage,
+                    icon: 'error',
+                    confirmButtonColor: 'var(--danger-color)'
+                });
+            }
+        }
+
+        function confirmDelete(userId) {
+            Swal.fire({
+                title: 'Delete User Account?',
+                text: "This action cannot be undone!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: 'var(--danger-color)',
+                cancelButtonColor: 'var(--primary-color)',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    deleteUser(userId);
+                }
+            });
+        }
+
+        async function deleteUser(userId) {
+            const csrfToken = document.querySelector('input[name="_csrf"]').value;
+            
+            try {
+                const response = await fetch(`/users/${userId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken
+                    }
+                });
+                if (!response.ok) {
+                    const data = await response.json();
+                    const errorMessage = data?.message || 
+                        (response.status === 401 ? 'Unauthorized access' : 'Failed to delete user');
+                    throw new Error(errorMessage);
+                }
+
+                await Swal.fire({
+                    title: 'Deleted!',
+                    text: 'User has been deleted',
+                    icon: 'success',
+                    confirmButtonColor: 'var(--secondary-color)'
+                });
+                window.location.href = '/users/';
+            } catch (error) {
+                await Swal.fire({
+                    title: 'Error!',
+                    text: error.message,
+                    icon: 'error',
+                    confirmButtonColor: 'var(--danger-color)'
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const message = /*[[${message}]]*/ null;
+            if (message) {
+                Swal.fire({
+                    title: 'Success!',
+                    text: message,
+                    icon: 'success',
+                    confirmButtonColor: 'var(--secondary-color)'
+                });
+            }
+        });
+    </script>
+</body>
+</html>

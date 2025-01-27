@@ -107,13 +107,14 @@ public class UserController {
 
     @GetMapping("/new")
     public String showCreateUserForm(Model model) {
-        // add model attribute to bind form data
-        model.addAttribute("user", new User());
         return "user/create-user";
     }
 
     @GetMapping("/{id}")
     public String getUserById(@PathVariable int id, Model model, Authentication authentication) {
+        if (!SecurityUtils.isAdmin(authentication) && id != SecurityUtils.getCurrentUserId(authentication)) {
+            return "error/403";
+        }
         User user = userService.getUserById(id);
         if (user == null) {
             return "error/404";
@@ -124,28 +125,88 @@ public class UserController {
         return "user/user";
     }
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PutMapping("/{id}")
-    public String updateUser(@PathVariable int id, @RequestBody UpdateUserDTO userDTO, Model model) {
-        System.out.println("userDTO: " + userDTO);
-        User newUser = userService.updateUser(userDTO, id);
-        if (newUser == null) {
+    @GetMapping("/{id}/update")
+    public String showUpdateUserForm(@PathVariable int id, Model model,
+             Authentication authentication, @RequestParam(required = false) String password) {
+        if (!SecurityUtils.isAdmin(authentication) && id != SecurityUtils.getCurrentUserId(authentication)) {
+            return "error/403";
+        }
+        User user = userService.getUserById(id);
+        if (user == null) {
             return "error/404";
         }
-        return "redirect:user/user/" + id;
+        model.addAttribute("password", password);
+        model.addAttribute("user", user);
+        return "user/update-user";
+    }
+
+    @ResponseBody
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateUser(
+            @PathVariable int id,
+            @Valid @RequestBody UpdateUserDTO userDTO,
+            BindingResult bindingResult
+    ) {
+        // Validate input
+        if (bindingResult.hasErrors()) {
+                // bindingResult automaticaly contains the validation errors
+                Map<String, String> errors = bindingResult.getFieldErrors()
+                    .stream()
+                    .collect(Collectors.toMap(
+                        FieldError::getField,
+                        FieldError::getDefaultMessage,
+                        (existingMsg, newMsg) -> existingMsg + ", " + newMsg
+                        ));
+                String errorMessage = errors.values().stream()
+                    .collect(Collectors.joining(", "));
+                Map<String, String> error = Collections.singletonMap(
+                    "error", errorMessage
+                );
+                return ResponseEntity.badRequest()
+                    .body(error);
+            }
+
+        try {
+            User updatedUser = userService.updateUser(userDTO, id);
+            if (updatedUser == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Collections.singletonMap("message", "User not found"));
+            }
+            
+            return ResponseEntity.ok(updatedUser);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                    .body(Collections.singletonMap("message", "Internal server error"));
+        }
     }
     
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseBody
     @DeleteMapping("/{id}")
-    public String deleteUserById(@PathVariable int id, Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return "redirect:/login";
+    public ResponseEntity<?> deleteUserById(
+            @PathVariable int id,
+            Authentication authentication
+    ) {
+        // Check authentication
+        if (SecurityUtils.getCurrentUserId(authentication) != id
+            && !SecurityUtils.isAdmin(authentication)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("message", "Unauthorized access"));
         }
-        
-        if (userService.getUserById(id) == null) {
-            return "error/404";
+
+        // Check user existence
+        User userToDelete = userService.getUserById(id);
+        if (userToDelete == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("message", "User not found"));
         }
-        userService.deleteUserById(id);
-        return "redirect:/users";
+
+        try {
+            userService.deleteUserById(id);
+            System.out.println("User deleted successfully");
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                    .body(Map.of("message", "Error deleting user"));
+        }
     }
 }

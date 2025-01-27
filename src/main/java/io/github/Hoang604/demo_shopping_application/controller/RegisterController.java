@@ -2,6 +2,7 @@ package io.github.Hoang604.demo_shopping_application.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.stream.Collectors;
 
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
@@ -45,12 +45,22 @@ public class RegisterController {
     ) {
         // Validate input
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest()
-                .body(bindingResult.getAllErrors()
+                // bindingResult automaticaly contains the validation errors
+                Map<String, String> errors = bindingResult.getFieldErrors()
                     .stream()
-                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                    .collect(Collectors.toList()));
-        }
+                    .collect(Collectors.toMap(
+                        FieldError::getField,
+                        FieldError::getDefaultMessage,
+                        (existingMsg, newMsg) -> existingMsg + ", " + newMsg
+                        ));
+                String errorMessage = errors.values().stream()
+                    .collect(Collectors.joining(", "));
+                Map<String, String> error = Collections.singletonMap(
+                    "error", errorMessage
+                );
+                return ResponseEntity.badRequest()
+                    .body(error);
+            }
 
         // Check existing user
         if (userService.exist(userDTO.username())) {

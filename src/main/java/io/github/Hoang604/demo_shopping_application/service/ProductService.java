@@ -43,18 +43,18 @@ public class ProductService {
             return null;
         }
 
-        if (productDTO.category() != null) {
-            Category category = categoryService.getCategoryById(productDTO.category().getId());
-            if (category == null) {
-                category = categoryService.createCategory(productDTO.category());
-            }
+        if (productDTO.categoryId() != null) {
+            Category category = categoryService.getCategoryById(productDTO.categoryId());
             existingProduct.setCategory(category);
         }
-
-        existingProduct.setTitle(productDTO.title());
-        existingProduct.setPrice(productDTO.price());
-        existingProduct.setRatingRate(productDTO.ratingRate());
-        existingProduct.setRatingCount(productDTO.ratingCount());
+        if (productDTO.title() != null)
+            existingProduct.setTitle(productDTO.title());
+        if (productDTO.price() != null)
+            existingProduct.setPrice(productDTO.price());
+        if (productDTO.description() != null)
+            existingProduct.setDescription(productDTO.description());
+        if (productDTO.image() != null)
+            existingProduct.setImage(productDTO.image());
 
         return productRepository.save(existingProduct);
     }
