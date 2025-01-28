@@ -32,9 +32,7 @@ public class HomeController {
     public String home(Authentication authentication, Model model) {
         if (authentication == null) {
             List<Product> products = productService.getRandomProducts(10);
-            System.out.println("abc");
             model.addAttribute("products", products);
-            System.out.println("abc: " + products);
             return "index";
         }
 
