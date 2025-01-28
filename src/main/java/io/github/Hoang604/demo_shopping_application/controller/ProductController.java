@@ -39,16 +39,22 @@ public class ProductController {
 
 
     @GetMapping("/")
-    public String getAllProducts(@RequestParam(required = false) Integer categoryId, Model model, Authentication authentication) {
-        List<Product> products = productService.getProductsByCategory(categoryId);
-        model.addAttribute("products", products);
-        if (categoryId != null){
+    public String getAllProducts(@RequestParam(required = false) Integer categoryId, Model model,
+            Authentication authentication) {
+        List<Product> products = null;
+        if (SecurityUtils.isAdmin(authentication)) {
+            products = productService.getAllProducts(categoryId);
+        }
+        else {
+            products = productService.getProductsByCategory(categoryId);
+        }
+        if (categoryId != null) {
             Category category = categoryService.getCategoryById(categoryId);
             model.addAttribute("category", category);
         }
+        model.addAttribute("products", products);
         List<Category> categories = categoryService.getAllCategories();
         model.addAttribute("categories", categories);
-
         Integer userId = SecurityUtils.getCurrentUserId(authentication);
         model.addAttribute("userId", userId);
         return "product/products";

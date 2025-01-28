@@ -10,9 +10,10 @@ import org.springframework.lang.NonNull;
 public class MvcConfig implements WebMvcConfigurer {
 
 	public void addViewControllers(@NonNull ViewControllerRegistry registry) {
-		registry.addViewController("/").setViewName("index");
-		registry.addViewController("/home").setViewName("index");
 		registry.addViewController("/login").setViewName("login");
+		registry.addRedirectViewController("/", "/home")
+			.setKeepQueryParams(true)
+				.setStatusCode(HttpStatus.MOVED_PERMANENTLY);
 		registry.addRedirectViewController("/products", "/products/")
 			.setKeepQueryParams(true)
 				.setStatusCode(HttpStatus.MOVED_PERMANENTLY);

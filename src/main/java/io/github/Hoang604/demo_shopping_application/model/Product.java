@@ -24,9 +24,9 @@ public class Product {
     @Column(name = "image")
     private String image;
     @Column(name = "rating_rate")
-    private double ratingRate;
+    private Double ratingRate;
     @Column(name = "rating_count")
-    private int ratingCount;
+    private Integer ratingCount;
 
     @ManyToOne
     @JoinColumn(name = "category_id", referencedColumnName = "id")
@@ -38,7 +38,7 @@ public class Product {
         this.price = 0;
         this.category = null;
         this.image = "";
-        this.ratingRate = 0;
+        this.ratingRate = 0.0;
         this.ratingCount = 0;
     }
 
@@ -48,11 +48,11 @@ public class Product {
         this.description = "";
         this.category = null;
         this.image = "";
-        this.ratingRate = 0;
+        this.ratingRate = 0.0;
         this.ratingCount = 0;
     }
     public Product(String title, String description, double price,
-            Category category, String image, int ratingRate, int ratingCount) {
+            Category category, String image, Double ratingRate, Integer ratingCount) {
         if (price < 0) {
             throw new IllegalArgumentException("price cannot be negative");
         }
@@ -122,22 +122,22 @@ public class Product {
         this.image = image;
     }
 
-    public double getRatingRate() {
+    public Double getRatingRate() {
         return ratingRate;
     }
 
-    public void setRatingRate(double ratingRate) {
+    public void setRatingRate(Double ratingRate) {
         if (ratingRate < 0) {
             throw new IllegalArgumentException("ratingRate cannot be negative");
         }
         this.ratingRate = ratingRate;
     }
 
-    public int getRatingCount() {
+    public Integer getRatingCount() {
         return ratingCount;
     }
 
-    public void setRatingCount(int ratingCount) {
+    public void setRatingCount(Integer ratingCount) {
         if (ratingCount < 0) {
             throw new IllegalArgumentException("ratingCount cannot be negative");
         }

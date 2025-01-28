@@ -280,9 +280,9 @@
                     <div class="rating-stars">
                         ★★★★★
                         <div class="rating-overlay" 
-                            th:style="'width: calc(' + (100 - (${product.ratingRate} * 20)) + '%)'"></div>
+                            th:style="'width: calc(' + (100 - (${product.ratingRate ?: 0} * 20)) + '%)'"></div>
                     </div>
-                    <span>(<span th:text="${product.ratingCount}"></span> reviews)</span>
+                    <span th:text="${product.ratingRate ?: 0}"></span> star (<span th:text="${product.ratingCount ? : 0}">0</span> reviews)
                 </div>
 
                 <div class="category-badge" th:text="${product.category.name}"></div>

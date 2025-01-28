@@ -7,7 +7,12 @@ import io.github.Hoang604.demo_shopping_application.model.Product;
 import io.github.Hoang604.demo_shopping_application.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -35,6 +40,33 @@ public class ProductService {
     
     public List<Product> getRandomProducts(int count) {
         return productRepository.findRandomProducts(count);
+    }
+
+    public List<Product> getProductsForPropose(Map<Integer, Long> categoryCount) {
+        List<Product> result = new ArrayList<>();
+        Random random = new Random();
+
+        for (Map.Entry<Integer, Long> entry : categoryCount.entrySet()) {
+            Category category = categoryService.getCategoryById(entry.getKey());
+            Long count = entry.getValue();
+
+            // Lấy tất cả sản phẩm trong danh mục
+            List<Product> productsInCategory = productRepository.findByCategory(category);
+
+            // Lấy ngẫu nhiên các sản phẩm theo tỷ lệ tương ứng với count
+            Collections.shuffle(productsInCategory, random);
+            List<Product> selectedProducts = productsInCategory.stream()
+                    .limit(count < 5 ? 5 : count)
+                    .collect(Collectors.toList());
+
+            result.addAll(selectedProducts);
+        }
+
+        if (result.size() < 10) {
+            List<Product> randomProducts = productRepository.findRandomProducts(10 - result.size());
+            result.addAll(randomProducts);
+        }
+        return result;
     }
 
     public Product getProductById(int id) {
@@ -71,11 +103,26 @@ public class ProductService {
         if (categoryId != null) {
             Category category = categoryService.getCategoryById(categoryId);
             if (category != null) {
+                List<Product> products = productRepository.findByCategory(category);
+                Collections.shuffle(products);
+                return products;
+            }
+        }
+        List<Product> products = productRepository.findAll();
+        Collections.shuffle(products);
+        return products;
+    }
+
+    public List<Product> getAllProducts(Integer categoryId) {
+        if (categoryId != null) {
+            Category category = categoryService.getCategoryById(categoryId);
+            if (category != null) {
                 return productRepository.findByCategory(category);
             }
         }
         return productRepository.findAll();
     }
+
     public List<Product> findByTitle(String title) {
         return productRepository.findByTitleContainingIgnoreCase(title);
     }

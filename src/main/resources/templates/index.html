@@ -414,10 +414,10 @@
             </section>
 
             <!-- Product Carousel Section -->
-            <section class="product-carousel" sec:authorize="hasRole('USER')">
+            <section class="product-carousel" sec:authorize="!hasRole('ADMIN')">
                 <div class="swiper-container">
                     <div class="swiper-wrapper">
-                        <div th:each="product : ${randomProducts}" class="swiper-slide" th:onclick="'window.location.href=\'' + @{/products/{id}(id=${product.id})} + '\''">
+                        <div th:each="product : ${products}" class="swiper-slide" th:onclick="'window.location.href=\'' + @{/products/{id}(id=${product.id})} + '\''">
                             <div class="slide-content">
                                 <img th:src="${product.image}" alt="Product Image" class="product-image" />
                                 <h3 class="product-title" th:text="${product.title}"></h3>
@@ -467,7 +467,7 @@
         </div>
     </main>
 
-    <section class="featured-sections" sec:authorize="hasRole('USER')">
+    <section class="featured-sections" sec:authorize="!hasRole('ADMIN')">
         <div class="container">
             <div class="featured-categories">
                 <h2>Featured Categories</h2>

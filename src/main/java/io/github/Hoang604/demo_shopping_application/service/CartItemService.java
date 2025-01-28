@@ -19,8 +19,13 @@ public class CartItemService {
         this.productService = productService;
         this.userService = userService;
     }
+
     public List<CartItem> getAllCartItems() {
         return cartItemRepository.findAll();
+    }
+
+    public List<CartItem> getCartItemsByUserId(int userId) {
+        return cartItemRepository.findByUserId(userId);
     }
 
     public CartItem getCartItemById(int id) {
