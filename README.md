@@ -11,9 +11,9 @@ This repository contains a demo shopping application developed as an Object-Orie
     *   Edit existing user information
     *   Remove users
 *   **Product Management:**
-    *   Add new products
-    *   Edit existing product information (e.g., name, price, description)
-    *   Remove products
+    *   Add new products (admin only)
+    *   Edit existing product information (e.g., name, price, description) (admin only)
+    *   Remove products (admin only)
 *   **Shopping Cart:**
     *   Add products to the cart
     *   Remove products from the cart
