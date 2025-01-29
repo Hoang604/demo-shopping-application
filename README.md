@@ -51,7 +51,9 @@ This repository contains a demo shopping application developed as an Object-Orie
 
 **Accessing the Application:**
 
-Once the containers are running, you can access the application through your web browser with url localhost:8080
+Once the containers are running, you can access the application through your web browser.
+
+*   **URL:** `localhost:8080`
 
 **Stopping the Application:**
 
