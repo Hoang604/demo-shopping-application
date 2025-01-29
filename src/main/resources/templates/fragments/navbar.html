@@ -292,8 +292,10 @@
                                 <li><a href="/products/?categoryId=2"><i class="fas fa-book"></i>Books</a></li>
                             </ul>
                         </li>
+                        <th:block th:if="${userId != null}">
                         <li><a th:href="@{'/users/' + ${userId} + '/cart/'}"><i class="fas fa-shopping-cart"></i>Cart</a></li>
                         <li><a th:href="@{'/users/' + ${userId} + '/orders/'}"><i class="fas fa-clipboard"></i>Orders</a></li>
+                        </th:block>
                     </ul>
 
                     <div class="nav-auth-buttons">
@@ -308,7 +310,7 @@
                             </a>
                         </th:block>
                         
-                        <th:block sec:authorize="isAuthenticated()">
+                        <th:block th:if="${userId != null}" sec:authorize="isAuthenticated()">
                             <a href="#" class="nav-auth-btn nav-logout" onclick="confirmLogout(event)">
                                 <i class="fas fa-sign-out-alt"></i>
                                 Logout

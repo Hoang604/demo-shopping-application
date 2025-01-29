@@ -447,15 +447,16 @@
                     <h2 class="card-title">User Management</h2>
                     <p>Manage user accounts and permissions</p>
                 </a>
-
-                <a th:href="@{'/users/' + ${userId} + '/orders/'}" class="dashboard-card card-link">
-                    <div class="card-icon">
-                        <i class="fas fa-receipt"></i>
-                    </div>
-                    <h2 class="card-title">Order History</h2>
-                    <p>View and manage your orders</p>
-                </a>
-
+                <th:block th:if="${userId != null}">
+                    <a th:href="@{'/users/' + ${userId} + '/orders/'}" class="dashboard-card card-link">
+                        <div class="card-icon">
+                            <i class="fas fa-receipt"></i>
+                        </div>
+                        <h2 class="card-title">Order History</h2>
+                        <p>View and manage your orders</p>
+                    </a>
+                </th:block>
+                <th:block th:if="${userId != null}"></th:block>
                 <a th:href="@{'/users/' + ${userId} + '/cart/'}" class="dashboard-card card-link">
                     <div class="card-icon">
                         <i class="fas fa-shopping-cart"></i>
@@ -463,6 +464,7 @@
                     <h2 class="card-title">Shopping Cart</h2>
                     <p>Manage your cart items</p>
                 </a>
+                </th:block>
             </div>
         </div>
     </main>
@@ -513,8 +515,10 @@
                 <ul>
                     <li><a href="/home">Home</a></li>
                     <li><a href="/products/">Products</a></li>
+                    <th:block th:if="${userId != null}">
                     <li><a th:href="@{'/users/' + ${userId} + '/cart/'}">Cart</a></li>
                     <li><a th:href="@{'/users/' + ${userId} + '/orders/'}">Orders</a></li>
+                    </th:block>
                     <li><a href="#">Contact Us</a></li>
                 </ul>
             </div>
