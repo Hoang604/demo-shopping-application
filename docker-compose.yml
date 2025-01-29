@@ -1,0 +1,26 @@
+  version: '3.8'
+  services:
+    app:
+      build: .
+      ports:
+        - "8080:8080"
+      depends_on:
+        - db  # Ứng dụng phụ thuộc vào database
+      environment:
+        # Cấu hình kết nối database cho ứng dụng của bạn (thay đổi cho phù hợp)
+        SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/fakestore?createDatabaseIfNotExist=true&autoReconnect=true
+        SPRING_DATASOURCE_USERNAME: Hoang
+        SPRING_DATASOURCE_PASSWORD: Hoangdeptry_05
+
+    db:
+      image: mysql:8.0.40  # Sử dụng image MySQL chính thức từ Docker Hub
+      environment:
+        MYSQL_ROOT_PASSWORD: rootpassword # Mật khẩu root MySQL (chỉ cho development, production cần bảo mật hơn)
+        MYSQL_DATABASE: fakestore # Tên database mặc định
+        MYSQL_USER: Hoang # User database
+        MYSQL_PASSWORD: Hoangdeptry_05 # Mật khẩu user database
+      volumes:
+        - db_data:/var/lib/mysql # Volume để lưu trữ dữ liệu MySQL bền vững
+
+  volumes:
+    db_data: # Định nghĩa volume db_data

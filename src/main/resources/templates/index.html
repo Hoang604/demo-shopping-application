@@ -414,7 +414,7 @@
             </section>
 
             <!-- Product Carousel Section -->
-            <section class="product-carousel" sec:authorize="!hasRole('ADMIN')">
+            <section class="product-carousel" sec:authorize="!hasRole('ADMIN') or isAnonymous()">
                 <div class="swiper-container">
                     <div class="swiper-wrapper">
                         <div th:each="product : ${products}" class="swiper-slide" th:onclick="'window.location.href=\'' + @{/products/{id}(id=${product.id})} + '\''">
