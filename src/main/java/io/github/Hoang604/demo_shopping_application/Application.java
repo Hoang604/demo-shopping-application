@@ -36,9 +36,11 @@ public class Application {
 				user.setPassword(encodedPassword);
 				user.setRole(role);
 				userRepository.save(user);
-				System.out.println("User created: " + username);
+				System.out.println("User created with username: " + username);
+				System.out.println("Password: " + password);
 			} else {
-				System.out.println("User already exists: " + username);
+				System.out.println("User exists for testing with username: " + username);
+				System.out.println("Password: " + password);
 			}
 		};
 	}
