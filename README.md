@@ -48,6 +48,10 @@ This repository contains a demo shopping application developed as an Object-Orie
     docker-compose up --build -d
     ```
     This command will build the necessary Docker images (if they don't exist) and start the application containers in detached mode.
+    If you want to run in normal mode (see log), remove -d option
+    ```bash
+    docker-compose up --build
+    ```
 
 **Accessing the Application:**
 
