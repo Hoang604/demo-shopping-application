@@ -33,6 +33,8 @@ public class HomeController {
         if (authentication == null) {
             List<Product> products = productService.getRandomProducts(10);
             model.addAttribute("products", products);
+            model.addAttribute("userId", null);
+            model.addAttribute("_csrf", null);
             return "index";
         }
 

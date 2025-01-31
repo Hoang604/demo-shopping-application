@@ -538,9 +538,11 @@
     </footer>
 
     <!-- Hidden logout form -->
-    <form id="logoutForm" action="/logout" method="post" style="display: none;">
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-    </form>
+    <th:block th:if="${_csrf != null}">
+        <form id="logoutForm" action="/logout" method="post" style="display: none;">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        </form>
+    </th:block>
 
     <script>
         function confirmLogout(event) {
