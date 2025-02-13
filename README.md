@@ -4,6 +4,10 @@
 
 This repository contains a demo shopping application developed as an Object-Oriented Programming (OOP) project at Phenikaa University. The application demonstrates core functionalities of an e-commerce platform, including user management, product catalog, shopping cart, and order processing, along with secure user authentication.
 
+**Link to product:** [Demo Web Application](https://demo-web-zadg.onrender.com/)
+
+*Note: This is a free trial, so the application may automatically shut down. It may take about 1 minute to restart.*
+
 **Project Features:**
 
 *   **User Management:**
